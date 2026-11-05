@@ -506,7 +506,7 @@ input, textarea {
 .typing-cursor {
     display: inline-block;
     width: 2px;
-    height: 1em;
+    height: 0.85em;
     background: currentColor;
     animation: cursor-blink 1s ease-in-out infinite;
     vertical-align: text-bottom;

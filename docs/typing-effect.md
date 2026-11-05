@@ -108,3 +108,13 @@ Tags können einfach im Array `roles` in `initHeroTyping()` (script.js) geänder
 2. `styles.css`: `.typing-cursor { overflow: hidden; }` — als Sicherheitsmaßnahme hinzugefügt
 
 **Betroffene Dateien:** `index.html`, `styles.css`, `docs/typing-effect.md`, `CHANGELOG.md`
+
+## Bug Fix: Cursor zu hoch (Baseline-Ausrichtung)
+**Problem:** Der blinkende Cursor ragte optisch zu weit über die Grossbuchstaben hinaus (Cap-Height), da er `height: 1em` (volle Zeilenhöhe) mit `vertical-align: text-bottom` hatte.
+
+**Ursache:** CSS `.typing-cursor { height: 1em; vertical-align: text-bottom; }` — der Cursor begann an der Grundlinie (text-bottom) und erstreckte sich um 1em nach oben, weit über die Cap-Height hinaus.
+
+**Fix (2025-11-05):**
+1. `styles.css`: `.typing-cursor { height: 0.85em; }` — Höhe auf ca. Cap-Height reduziert (0.85em ≈ Grossbuchstaben-Höhe)
+
+**Betroffene Dateien:** `styles.css`, `docs/typing-effect.md`, `CHANGELOG.md`
