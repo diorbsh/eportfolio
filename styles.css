@@ -55,6 +55,7 @@
     --color-primary-light: rgba(255, 255, 255, 0.1);
     --color-secondary: #999999;
     --color-secondary-hover: #aaaaaa;
+    --color-spotlight: 77, 166, 255;
 }
 
 [data-theme="light"] {
@@ -71,6 +72,7 @@
     --color-overlay: rgba(255, 255, 255, 0.9);
     --color-code-bg: #f5f5f5;
     --color-code-text: #1d1d1f;
+    --color-spotlight: 0, 102, 204;
 }
 
 *, *::before, *::after {
@@ -854,6 +856,32 @@ input, textarea {
     border-color: var(--color-border-hover);
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+}
+
+/* Spotlight Effect */
+.spotlight-card {
+    position: relative;
+    isolation: isolate; /* Creates new stacking context for ::before */
+}
+
+.spotlight-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(var(--color-spotlight), 0.15),
+        transparent 60%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+    z-index: -1;
+}
+
+.spotlight-card:hover::before {
+    opacity: 1;
 }
 
 .project-card.hidden {

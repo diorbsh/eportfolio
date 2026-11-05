@@ -186,6 +186,7 @@
         initHeaderScroll();
         initPageTransitions();
         initHeroTyping();
+        initSpotlightCards();
 
         state.projects = projectsData;
         renderProjects();
@@ -372,12 +373,62 @@
         });
     }
 
+    function initSpotlightCards() {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) return;
+
+        const cards = document.querySelectorAll('.spotlight-card');
+
+        cards.forEach(card => {
+            let rafId = null;
+            let isHovering = false;
+
+            const handleMouseMove = (e) => {
+                if (!isHovering) return;
+
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            };
+
+            const handleMouseEnter = () => {
+                isHovering = true;
+                card.addEventListener('mousemove', handleMouseMove);
+            };
+
+            const handleMouseLeave = () => {
+                isHovering = false;
+                card.removeEventListener('mousemove', handleMouseMove);
+                // Reset to center for smooth transition out
+                card.style.setProperty('--mouse-x', '50%');
+                card.style.setProperty('--mouse-y', '50%');
+            };
+
+            card.addEventListener('mouseenter', handleMouseEnter);
+            card.addEventListener('mouseleave', handleMouseLeave);
+
+            // Cleanup on card removal (e.g., filter change)
+            const observer = new MutationObserver(() => {
+                if (!document.body.contains(card)) {
+                    card.removeEventListener('mouseenter', handleMouseEnter);
+                    card.removeEventListener('mouseleave', handleMouseLeave);
+                    card.removeEventListener('mousemove', handleMouseMove);
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    }
+
     function renderProjects() {
         const grid = document.getElementById('projectsGrid');
         if (!grid) return;
 
         grid.innerHTML = projectsData.map((project, index) => `
-            <article class="project-card" data-category="${project.category}" style="animation-delay: ${index * 100}ms">
+            <article class="project-card spotlight-card" data-category="${project.category}" style="animation-delay: ${index * 100}ms">
                 <div class="project-image" aria-hidden="true">
                     <img src="${project.image}" alt="${project.title}" loading="lazy" />
                 </div>
@@ -393,6 +444,7 @@
         `).join('');
 
         initProjectCards();
+        initSpotlightCards();
     }
 
     function initSkillTags() {

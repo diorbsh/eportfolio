@@ -39,6 +39,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Accessibility: `aria-hidden="true"` on decorative canvas
 - Documentation: `docs/milestone-3d-01.md`
 
+### Added (Card Spotlight Effect)
+- **Soft Radial Spotlight** — CSS `::before` pseudo-element with radial gradient following mouse position on card hover
+- Applied to 5 card types: Project cards, Stat cards, Value cards, Skill categories, Contact methods
+- CSS Custom Properties (`--mouse-x`, `--mouse-y`) updated via throttled `mousemove` listener
+- Theme-aware colors via `--color-spotlight` variable (Light: `#0066cc`, Dark: `#4da6ff`)
+- `isolation: isolate` for correct stacking context, `z-index: -1` keeps spotlight behind content
+- Full `prefers-reduced-motion` support: effect disabled, no JS listeners attached
+- Memory-safe: MutationObserver cleanup when cards removed (e.g., project filtering)
+- Documentation: `docs/spotlight-effect.md`
+
 ---
 
 ## [1.0.0] - 2025-10-18
