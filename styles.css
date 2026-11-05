@@ -512,6 +512,7 @@ input, textarea {
     vertical-align: text-bottom;
     margin-left: 2px;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 @keyframes cursor-blink {

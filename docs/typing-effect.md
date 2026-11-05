@@ -97,3 +97,14 @@ const roles = [
 
 ## Anpassung der Tags
 Tags können einfach im Array `roles` in `initHeroTyping()` (script.js) geändert werden. Reihenfolge = Anzeigereihenfolge.
+
+## Bug Fix: Doppelter Cursor
+**Problem:** Der Cursor wurde doppelt angezeigt (einmal als CSS-Block-Cursor, einmal als `|`-Zeichen im HTML), da der `<span class="typing-cursor">|</span>` den Textinhalt `|` hatte, der ohne `overflow: hidden` neben dem 2px breiten Block-Cursor sichtbar war.
+
+**Ursache:** HTML `<span class="typing-cursor" aria-hidden="true">|</span>` + CSS `.typing-cursor { width: 2px; background: currentColor; animation: cursor-blink... }` ohne `overflow: hidden`.
+
+**Fix (2025-11-05):**
+1. `index.html`: `<span class="typing-cursor" aria-hidden="true"></span>` — `|` entfernt
+2. `styles.css`: `.typing-cursor { overflow: hidden; }` — als Sicherheitsmaßnahme hinzugefügt
+
+**Betroffene Dateien:** `index.html`, `styles.css`, `docs/typing-effect.md`, `CHANGELOG.md`

@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Roles defined as constant array for easy maintenance
 - Works in Light/Dark mode and mobile without text wrapping issues
 
+### Fixed
+- **Duplicate cursor in typing effect** — Removed `|` character from HTML cursor span (was visible alongside CSS block cursor due to missing `overflow: hidden`); added `overflow: hidden` to `.typing-cursor` as safeguard
+
 ---
 
 ## [1.0.0] - 2025-10-18
