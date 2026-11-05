@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Dependencies
+node_modules/
+react-timeline/node_modules/
+
+# Build outputs
+react-timeline/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# OS
+Thumbs.db

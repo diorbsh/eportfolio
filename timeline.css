@@ -1,0 +1,408 @@
+/* Telerik-style Vertical Timeline Component */
+/* Inspired by Telerik UI Timeline - alternating left/right cards with central line */
+
+.telerik-timeline-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.timeline-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.timeline-header .section-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.timeline-header .section-subtitle {
+  font-size: 1.125rem;
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+/* Timeline wrapper with central line */
+.timeline-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Central vertical line */
+.timeline-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-border), var(--color-primary), var(--color-border));
+  transform: translateX(-50%);
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* Timeline items container */
+.timeline-items {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+  z-index: 2;
+}
+
+/* Individual timeline item */
+.timeline-item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Left side items (even indices) */
+.timeline-item--left {
+  flex-direction: row;
+  padding-right: calc(50% + var(--space-xl));
+}
+
+.timeline-item--left .timeline-card {
+  max-width: calc(50% - var(--space-xl));
+  width: 100%;
+  text-align: right;
+}
+
+.timeline-item--left .card-header {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.timeline-item--left .card-badge {
+  justify-content: flex-end;
+}
+
+/* Right side items (odd indices) */
+.timeline-item--right {
+  flex-direction: row-reverse;
+  padding-left: calc(50% + var(--space-xl));
+}
+
+.timeline-item--right .timeline-card {
+  max-width: calc(50% - var(--space-xl));
+  width: 100%;
+  text-align: left;
+}
+
+.timeline-item--right .card-header {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.timeline-item--right .card-badge {
+  justify-content: flex-start;
+}
+
+/* Timeline card */
+.timeline-card {
+  position: relative;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: timelineFadeIn 0.6s var(--transition-slow) forwards;
+}
+
+@keyframes timelineFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timeline-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-border-hover);
+}
+
+/* Card header with icon and date */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.card-header .card-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-date {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  white-space: normal;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.25;
+  word-break: break-word;
+  text-align: left;
+}
+
+.timeline-item--left .card-date {
+  text-align: right;
+}
+
+.timeline-item--right .card-date {
+  text-align: left;
+}
+
+/* Card content */
+.card-content {
+  padding: var(--space-sm) 0;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+  line-height: 1.3;
+}
+
+.card-company {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  line-height: 1.4;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Card badges */
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Pulse animation only on education and current */
+.card-badge.education,
+.card-badge.current {
+  animation: badgePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--item-color); }
+  50% { box-shadow: 0 0 0 10px transparent; }
+}
+
+/* Timeline dot on central line */
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: var(--space-lg);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  border: 3px solid var(--color-bg);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.timeline-item:hover .timeline-dot {
+  transform: translateX(-50%) scale(1.25);
+  box-shadow:
+    0 0 0 4px var(--color-bg),
+    0 0 0 6px var(--item-color),
+    0 0 24px var(--item-color);
+}
+
+/* Connector line between dots */
+.timeline-connector {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--space-lg) + 8px);
+  bottom: calc(-100% + var(--space-lg) + 8px);
+  width: 2px;
+  transform: translateX(-50%);
+  z-index: 1;
+  border-radius: 1px;
+  opacity: 0.6;
+  transition: opacity var(--transition-base);
+}
+
+.timeline-item:hover .timeline-connector {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .timeline-line {
+    left: 32px;
+  }
+
+  .timeline-dot {
+    left: 32px;
+  }
+
+  .timeline-connector {
+    left: 32px;
+  }
+
+  .timeline-item--left,
+  .timeline-item--right {
+    flex-direction: row !important;
+    padding-left: 72px !important;
+    padding-right: 0 !important;
+    text-align: left !important;
+  }
+
+  .timeline-item--left .timeline-card,
+  .timeline-item--right .timeline-card {
+    max-width: calc(100% - 72px);
+    width: 100%;
+    text-align: left !important;
+  }
+
+  .timeline-item--left .card-header,
+  .timeline-item--right .card-header {
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+  }
+
+  .timeline-item--left .card-badge,
+  .timeline-item--right .card-badge {
+    justify-content: flex-start !important;
+  }
+
+  .timeline-item--left .card-date,
+  .timeline-item--right .card-date {
+    text-align: left !important;
+  }
+
+  .card-header {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .telerik-timeline-container {
+    padding: 0 var(--space-md);
+  }
+
+  .timeline-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .timeline-items {
+    gap: var(--space-xl);
+  }
+
+  .timeline-card {
+    padding: var(--space-md);
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-company {
+    font-size: 0.85rem;
+  }
+
+  .card-description {
+    font-size: 0.8rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .timeline-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .card-badge {
+    animation: none;
+  }
+
+  .timeline-dot {
+    transition: none;
+  }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .timeline-line {
+  background: linear-gradient(180deg, var(--color-border), var(--color-primary), var(--color-border));
+}
+
+[data-theme="dark"] .timeline-dot {
+  border-color: var(--color-bg);
+}
+
+/* Print styles */
+@media print {
+  .timeline-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .timeline-line {
+    background: #ccc !important;
+  }
+
+  .card-icon,
+  .card-date,
+  .card-badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
