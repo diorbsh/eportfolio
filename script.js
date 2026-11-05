@@ -185,6 +185,7 @@
         initKeyboardNavigation();
         initHeaderScroll();
         initPageTransitions();
+        initHeroTyping();
 
         state.projects = projectsData;
         renderProjects();
@@ -704,6 +705,103 @@
                 }
             });
         });
+    }
+
+    /**
+     * Typing-Effekt für den Hero-Rollen-Tag
+     * Wechselt durch verschiedene Rollen mit Typewriter-Animation
+     * Respektiert prefers-reduced-motion (zeigt nur erste Rolle statisch)
+     */
+    function initHeroTyping() {
+        const roleElement = document.querySelector('.hero-role-text');
+        const cursorElement = document.querySelector('.typing-cursor');
+        const srOnlyElement = document.querySelector('.hero .sr-only');
+
+        if (!roleElement || !cursorElement) return;
+
+        const roles = [
+            'Software Developer',
+            'Mobile App Developer',
+            'IoT Specialist',
+            'Embedded Systems Developer',
+            'API & Integration Developer',
+            'Cloud Enthusiast',
+            'QMS Process Manager',
+            'Wirtschaftsinformatik-Student',
+            'Clean Code Fan'
+        ];
+
+        // Bei prefers-reduced-motion: nur erste Rolle statisch anzeigen
+        if (prefersReducedMotion) {
+            roleElement.textContent = roles[0];
+            cursorElement.style.display = 'none';
+            if (srOnlyElement) {
+                srOnlyElement.textContent = roles[0];
+            }
+            return;
+        }
+
+        let roleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeSpeed = 80;      // ms pro Zeichen beim Tippen
+        const deleteSpeed = 40;    // ms pro Zeichen beim Löschen
+        const pauseAfterType = 2000; // Pause nach vollständigem Tippen
+        const pauseAfterDelete = 500; // Pause vor nächstem Tippen
+
+        // Screenreader-Text aktualisieren
+        function updateSrText(text) {
+            if (srOnlyElement) {
+                srOnlyElement.textContent = text;
+            }
+        }
+
+        // Initiale Screenreader-Text
+        updateSrText(roles[0]);
+
+        function type() {
+            const currentRole = roles[roleIndex];
+
+            if (isDeleting) {
+                // Zeichen löschen
+                roleElement.textContent = currentRole.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                // Zeichen tippen
+                roleElement.textContent = currentRole.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            // Screenreader nur bei vollständigen Wörtern updaten (nicht bei jedem Buchstaben)
+            if (!isDeleting && charIndex === currentRole.length) {
+                updateSrText(currentRole);
+            }
+
+            // Prüfen ob Wort fertig getippt
+            if (!isDeleting && charIndex === currentRole.length) {
+                isDeleting = true;
+                setTimeout(type, pauseAfterType);
+                return;
+            }
+
+            // Prüfen ob Wort fertig gelöscht
+            if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                setTimeout(type, pauseAfterDelete);
+                return;
+            }
+
+            // Nächstes Zeichen
+            const speed = isDeleting ? deleteSpeed : typeSpeed;
+            setTimeout(type, speed);
+        }
+
+        // Cursor blinken lassen
+        cursorElement.style.animation = 'cursor-blink 1s ease-in-out infinite';
+
+        // Starten
+        type();
     }
 
     function debounce(func, wait) {

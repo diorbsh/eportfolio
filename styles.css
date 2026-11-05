@@ -493,6 +493,51 @@ input, textarea {
     font-weight: 500;
     color: var(--color-text-secondary);
     margin-bottom: var(--space-md);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    min-height: 1.5em;
+}
+
+.hero-role-text {
+    display: inline-block;
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: currentColor;
+    animation: cursor-blink 1s ease-in-out infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    flex-shrink: 0;
+}
+
+@keyframes cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Screenreader-only utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Reduced Motion: Cursor ausblenden, Animation stoppen */
+@media (prefers-reduced-motion: reduce) {
+    .typing-cursor {
+        display: none !important;
+        animation: none !important;
+    }
 }
 
 .hero-description {
