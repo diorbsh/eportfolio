@@ -30,6 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Duplicate cursor in typing effect** — Removed `|` character from HTML cursor span (was visible alongside CSS block cursor due to missing `overflow: hidden`); added `overflow: hidden` to `.typing-cursor` as safeguard
 - **Cursor baseline alignment** — Reduced cursor height from `1em` to `0.85em` to align with cap-height (was extending above capital letters due to full line-height with `vertical-align: text-bottom`)
 
+### Added (3D Hero — M1)
+- **Three.js Scene Foundation** — Transparent WebGL canvas behind Hero content, lazy-loaded via dynamic import
+- WebGL support detection & `prefers-reduced-motion` fallback (graceful degradation)
+- Render-loop pausing via IntersectionObserver (Hero visibility) + `visibilitychange` (tab background)
+- Resize handling with debounced renderer/camera update
+- Full resource cleanup on dispose (geometries, materials, renderer, context loss)
+- Accessibility: `aria-hidden="true"` on decorative canvas
+- Documentation: `docs/milestone-3d-01.md`
+
 ---
 
 ## [1.0.0] - 2025-10-18
