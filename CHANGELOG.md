@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2025-11-06
+
+### Added
+- **Professional Contact Form Success & Error States** — Complete overhaul of form submission feedback:
+  - **Sending state**: Button shows spinner + "Wird gesendet…", form fields disabled, visual opacity reduction
+  - **Success state**: Form fades out (300ms), replaced by success view with:
+    - SVG checkmark with stroke animation (circle draws in ~700ms, check draws in ~500ms with delay) in accent color
+    - Headline "Nachricht gesendet"
+    - Text "Danke für deine Nachricht. Ich melde mich bald bei dir zurück."
+    - Subtle contact echo "Antwort an: [entered email/phone]"
+    - "Neue Nachricht schreiben" button to reset form cleanly
+  - **Error state**: Form stays with all data intact, shows inline error message above form:
+    - Message "Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut oder schreibe mir direkt per E-Mail."
+    - "Erneut versuchen" button to return to form
+    - No harsh red; uses theme-aware error color
+  - Field-level validation with inline error messages (required fields, email/phone format)
+  - All transitions respect `prefers-reduced-motion` (instant state changes, no animations)
+
+### Technical Details
+- **No false success** — Success view only shown after verified `response.ok` from FormSubmit.co; network errors, timeouts, non-2xx status → error state
+- **Double-submit prevention** — `isSubmitting` flag + disabled button + form opacity; second clicks/Enter ignored
+- **Data preservation on error** — Form reset only on success; error keeps all user input
+- **Client-side validation** — Required fields + email/phone regex; inline error messages with `aria-live="polite"`; real-time clearing on input
+- **Layout stability** — Form container maintains height during transitions; `hidden` + CSS transitions for smooth cross-fade; no scroll jump
+- **Timer cleanup** — 15s fetch timeout via `AbortController`; `clearTimeout`/`cancelAnimationFrame` on unload and state changes; no StrictMode warnings
+- **Accessibility** — `aria-live="polite"` for status, `role="alert"` for error, `role="status"` for success; focus management (success title / error text get `tabindex="-1"` + `focus()`); keyboard-operable buttons with visible focus rings
+- **Reduced motion** — `@media (prefers-reduced-motion: reduce)` disables stroke animation and fade transitions; instant state swap
+- **Theme support** — Success checkmark uses `--color-accent`; error uses `--color-error`; all colors adapt live to Dark/Light toggle
+- **Mobile friendly** — Success/error views responsive; long emails wrap via `word-break: break-word`; no horizontal scroll
+- **Coexistence** — Form states isolated from spotlight/hover effects; no interference with other page animations
+- **Privacy** — No console logging of form data; no localStorage/sessionStorage usage
+
+### Documentation
+- Added `docs/contact-success-state.md` with implementation details and customization guide
+
 ## [1.3.0] - 2025-11-06
 
 ### Added
