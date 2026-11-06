@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2025-11-06
+
+### Added
+- **Copy-to-Clipboard Buttons for Contact Cards** — Each contact method (E-Mail, GitHub, LinkedIn) now has a copy button:
+  - Click copies the exact displayed value (E-Mail address, GitHub URL, LinkedIn URL) to clipboard
+  - Button shows checkmark icon + "Kopiert!" tooltip for 2 seconds, then reverts
+  - Subtle pop-in animation for checkmark, smooth fade for tooltip
+  - Desktop: button appears on card hover/focus; Touch: button always visible (min 40×40px tap target)
+  - Full keyboard support: focusable, activatable with Enter/Space, visible focus ring
+  - Screenreader support: `aria-live="polite"` announces "Kopiert!", `aria-label` describes action
+  - Theme-aware colors: adapts instantly to Dark/Light mode toggle
+  - No layout shift: fixed-size button, tooltip as overlay
+
+### Technical Details
+- **Clipboard API with fallback** — Uses `navigator.clipboard.writeText()` in secure contexts, falls back to hidden textarea + `execCommand('copy')` for compatibility
+- **Error handling** — `try/catch` on both methods; on failure shows "Fehlgeschlagen" instead of false success
+- **Per-card state** — Each button manages its own `copied` state and timeout; rapid clicks on multiple cards work independently
+- **Timer cleanup** — `setTimeout` cleared on re-click and on page unload (`beforeunload`); no memory leaks, no StrictMode warnings
+- **No navigation interference** — Buttons are real `<button type="button">` outside link wrappers; `preventDefault()` + `stopPropagation()` on click
+- **Touch-friendly** — `@media (hover: none)` makes buttons always visible with adequate tap target
+- **Reduced motion** — `@media (prefers-reduced-motion: reduce)` disables animations, keeps instant icon/text swap
+- **Spotlight coexistence** — Button has `z-index: 1`, spotlight `::before` has `z-index: 0`; button stays clickable above spotlight
+- **Semantic HTML** — Contact cards restructured: outer `.contact-method` (div), inner `.method-link` (a), sibling `.copy-btn` (button)
+- **Exact value copy** — Uses `data-copy-target` attribute with trimmed values; no whitespace/newlines
+
+### Documentation
+- Added `docs/copy-button.md` with implementation details and customization guide
+
 ## [1.2.0] - 2025-11-06
 
 ### Added

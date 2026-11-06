@@ -1216,7 +1216,7 @@ input, textarea {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     transition: all var(--transition-base);
-    text-decoration: none;
+    position: relative;
 }
 
 .contact-method:hover {
@@ -1224,6 +1224,159 @@ input, textarea {
     background: var(--color-card-hover);
     transform: translateX(4px);
     color: var(--color-primary);
+}
+
+/* Ensure link fills the card for clickability */
+.method-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex: 1;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+}
+
+.method-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+    border-radius: var(--radius-md);
+}
+
+/* Copy Button */
+.copy-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-tertiary);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-fast);
+    position: relative;
+    flex-shrink: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(8px);
+}
+
+.copy-btn .copy-icon {
+    display: block;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.copy-btn .check-icon {
+    display: none;
+    position: absolute;
+    color: var(--color-accent);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+/* Tooltip */
+.copy-tooltip {
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-bg);
+    background: var(--color-text);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    transform: translateY(-50%) translateX(4px);
+}
+
+.copy-tooltip::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 4px solid transparent;
+    border-left-color: var(--color-text);
+}
+
+/* Hover/Focus states for desktop */
+@media (hover: hover) and (pointer: fine) {
+    .contact-method:hover .copy-btn,
+    .contact-method:focus-within .copy-btn {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+    }
+}
+
+/* Touch devices: always visible */
+@media (hover: none) {
+    .copy-btn {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+    }
+}
+
+/* Active copy state */
+.copy-btn.copied .copy-icon {
+    display: none;
+}
+
+.copy-btn.copied .check-icon {
+    display: block;
+    animation: check-pop var(--transition-fast) ease-out;
+}
+
+.copy-btn.copied .copy-tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+@keyframes check-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Focus visible for keyboard navigation */
+.copy-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .copy-btn,
+    .copy-tooltip,
+    .copy-btn .copy-icon,
+    .copy-btn .check-icon {
+        transition: none;
+    }
+
+    .copy-btn.copied .check-icon {
+        animation: none;
+    }
+}
+
+/* Ensure spotlight overlay doesn't cover the button */
+.contact-method.spotlight-card {
+    isolation: isolate;
+}
+
+.contact-method.spotlight-card::before {
+    z-index: 0;
+}
+
+.copy-btn {
+    z-index: 1;
 }
 
 .method-icon {

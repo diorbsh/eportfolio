@@ -187,6 +187,7 @@
         initPageTransitions();
         initHeroTyping();
         initSpotlightCards();
+        initCopyButtons();
         const photoTiltCleanup = initHeroPhotoTilt();
 
         state.projects = projectsData;
@@ -451,6 +452,7 @@
 
         initProjectCards();
         initSpotlightCards();
+        initCopyButtons();
     }
 
     function initSkillTags() {
@@ -850,6 +852,146 @@
         profileWrapper._tiltCleanup = cleanup;
 
         return cleanup;
+    }
+
+    /**
+     * Copy-to-clipboard buttons for contact cards
+     * Handles clipboard API with fallback, per-card state, cleanup, accessibility
+     */
+    function initCopyButtons() {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const copyButtons = document.querySelectorAll('.copy-btn');
+
+        if (!copyButtons.length) return;
+
+        copyButtons.forEach(button => {
+            const copyTarget = button.dataset.copyTarget;
+            const copyLabel = button.dataset.copyLabel || 'Inhalt';
+            let copyTimeout = null;
+            let isCopied = false;
+
+            // Copy to clipboard with fallback
+            async function copyToClipboard(text) {
+                // Try modern Clipboard API first (requires secure context)
+                if (navigator.clipboard && window.isSecureContext) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (err) {
+                        // Fall through to fallback
+                        console.warn('Clipboard API failed, using fallback:', err);
+                    }
+                }
+
+                // Fallback: hidden textarea + execCommand
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.setAttribute('readonly', '');
+                    textarea.style.position = 'absolute';
+                    textarea.style.left = '-9999px';
+                    textarea.style.top = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    textarea.setSelectionRange(0, text.length);
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    return success;
+                } catch (err) {
+                    console.error('Copy fallback failed:', err);
+                    return false;
+                }
+            }
+
+            function showCopied() {
+                if (isCopied) return;
+                isCopied = true;
+                button.classList.add('copied');
+                button.setAttribute('aria-label', `${copyLabel} kopiert`);
+
+                // Clear any existing timeout
+                if (copyTimeout) clearTimeout(copyTimeout);
+
+                // Reset after 2 seconds
+                copyTimeout = setTimeout(() => {
+                    resetButton();
+                }, 2000);
+            }
+
+            function showFailed() {
+                if (isCopied) return;
+                isCopied = true;
+                button.classList.add('copied');
+                button.setAttribute('aria-label', `${copyLabel} - Kopieren fehlgeschlagen`);
+                // Change tooltip text to indicate failure
+                const tooltip = button.querySelector('.copy-tooltip');
+                if (tooltip) {
+                    tooltip.textContent = 'Fehlgeschlagen';
+                }
+
+                if (copyTimeout) clearTimeout(copyTimeout);
+                copyTimeout = setTimeout(() => {
+                    resetButton();
+                    if (tooltip) tooltip.textContent = 'Kopiert!';
+                }, 2000);
+            }
+
+            function resetButton() {
+                isCopied = false;
+                button.classList.remove('copied');
+                button.setAttribute('aria-label', `${copyLabel} kopieren`);
+                if (copyTimeout) {
+                    clearTimeout(copyTimeout);
+                    copyTimeout = null;
+                }
+            }
+
+            function handleClick(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Don't do anything if already in copied state
+                if (isCopied) return;
+
+                copyToClipboard(copyTarget).then(success => {
+                    if (success) {
+                        showCopied();
+                    } else {
+                        showFailed();
+                    }
+                });
+            }
+
+            function handleKeyDown(e) {
+                // Trigger on Enter or Space
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClick(e);
+                }
+            }
+
+            // Cleanup function for this button
+            function cleanup() {
+                if (copyTimeout) clearTimeout(copyTimeout);
+                button.removeEventListener('click', handleClick);
+                button.removeEventListener('keydown', handleKeyDown);
+            }
+
+            // Attach listeners
+            button.addEventListener('click', handleClick);
+            button.addEventListener('keydown', handleKeyDown);
+
+            // Store cleanup for potential unmount
+            button._copyCleanup = cleanup;
+        });
+
+        // Global cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            copyButtons.forEach(button => {
+                if (button._copyCleanup) button._copyCleanup();
+            });
+        }, { once: true });
     }
 
     function initKeyboardNavigation() {
