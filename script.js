@@ -187,6 +187,7 @@
         initPageTransitions();
         initHeroTyping();
         initSpotlightCards();
+        const photoTiltCleanup = initHeroPhotoTilt();
 
         state.projects = projectsData;
         renderProjects();
@@ -194,6 +195,11 @@
         // renderTimeline() - now handled by React component
 
         document.documentElement.classList.add('js-loaded');
+
+        // Cleanup on page unload (handles StrictMode-like double-init in dev)
+        if (photoTiltCleanup) {
+            window.addEventListener('beforeunload', photoTiltCleanup, { once: true });
+        }
     }
 
     function loadTheme() {
@@ -680,6 +686,170 @@
         hero.addEventListener('mouseleave', () => {
             codeWindow.style.transform = 'perspective(1000px) rotateY(-5deg) rotateX(5deg)';
         });
+    }
+
+    function initHeroPhotoTilt() {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+        if (prefersReducedMotion || !hasHover) return;
+
+        const profileWrapper = document.querySelector('.profile-wrapper');
+        const profileTiltInner = document.querySelector('.profile-tilt-inner');
+        const profileImage = document.querySelector('.profile-image');
+        const hero = document.querySelector('.hero');
+
+        if (!profileWrapper || !profileTiltInner || !profileImage || !hero) return;
+
+        let rafId = null;
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let currentShineX = 0;
+        let currentShineY = 0;
+        let targetShineX = 0;
+        let targetShineY = 0;
+        const maxTilt = 8; // degrees - max 8° per axis
+        const isHovering = false;
+
+        function animate() {
+            // Smooth interpolation for tilt
+            currentX += (targetX - currentX) * 0.15;
+            currentY += (targetY - currentY) * 0.15;
+
+            // Smooth interpolation for shine (slower, more subtle)
+            currentShineX += (targetShineX - currentShineX) * 0.08;
+            currentShineY += (targetShineY - currentShineY) * 0.08;
+
+            // Apply tilt transform via CSS variables on the inner container
+            profileTiltInner.style.setProperty('--tilt-x', `${-currentY}deg`);
+            profileTiltInner.style.setProperty('--tilt-y', `${currentX}deg`);
+
+            // Update glow position (follows mouse with slight offset for depth)
+            profileWrapper.style.setProperty('--glow-x', `${50 + currentX * 1.5}%`);
+            profileWrapper.style.setProperty('--glow-y', `${50 - currentY * 1.5}%`);
+
+            // Update shine position (follows mouse with more offset for glint effect)
+            profileWrapper.style.setProperty('--shine-x', `${50 + currentShineX * 3}%`);
+            profileWrapper.style.setProperty('--shine-y', `${50 - currentShineY * 3}%`);
+
+            // Continue animation if there's still movement
+            const tiltMoving = Math.abs(targetX - currentX) > 0.01 || Math.abs(targetY - currentY) > 0.01;
+            const shineMoving = Math.abs(targetShineX - currentShineX) > 0.01 || Math.abs(targetShineY - currentShineY) > 0.01;
+
+            if (tiltMoving || shineMoving) {
+                rafId = requestAnimationFrame(animate);
+            } else {
+                rafId = null;
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = profileWrapper.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Calculate normalized position (-1 to 1)
+            const deltaX = (e.clientX - centerX) / (rect.width / 2);
+            const deltaY = (e.clientY - centerY) / (rect.height / 2);
+
+            // Clamp and apply max tilt
+            targetX = Math.max(-1, Math.min(1, deltaX)) * maxTilt;
+            targetY = Math.max(-1, Math.min(1, deltaY)) * maxTilt;
+
+            // Shine follows mouse with same normalization but different range
+            targetShineX = Math.max(-1, Math.min(1, deltaX));
+            targetShineY = Math.max(-1, Math.min(1, deltaY));
+
+            if (!rafId) {
+                rafId = requestAnimationFrame(animate);
+            }
+        }
+
+        function handleMouseLeave() {
+            targetX = 0;
+            targetY = 0;
+            targetShineX = 0;
+            targetShineY = 0;
+            // Reset glow and shine to center
+            profileWrapper.style.setProperty('--glow-x', '50%');
+            profileWrapper.style.setProperty('--glow-y', '50%');
+            profileWrapper.style.setProperty('--shine-x', '50%');
+            profileWrapper.style.setProperty('--shine-y', '50%');
+
+            if (!rafId) {
+                rafId = requestAnimationFrame(animate);
+            }
+        }
+
+        function handleBlur() {
+            // Reset on window/tab blur
+            targetX = 0;
+            targetY = 0;
+            targetShineX = 0;
+            targetShineY = 0;
+            profileWrapper.style.setProperty('--glow-x', '50%');
+            profileWrapper.style.setProperty('--glow-y', '50%');
+            profileWrapper.style.setProperty('--shine-x', '50%');
+            profileWrapper.style.setProperty('--shine-y', '50%');
+
+            if (!rafId) {
+                rafId = requestAnimationFrame(animate);
+            }
+        }
+
+        function handleScroll() {
+            // Reset when hero scrolls out of viewport
+            const heroRect = hero.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            // If hero is completely out of view (top or bottom)
+            if (heroRect.bottom <= 0 || heroRect.top >= viewportHeight) {
+                targetX = 0;
+                targetY = 0;
+                targetShineX = 0;
+                targetShineY = 0;
+                profileWrapper.style.setProperty('--glow-x', '50%');
+                profileWrapper.style.setProperty('--glow-y', '50%');
+                profileWrapper.style.setProperty('--shine-x', '50%');
+                profileWrapper.style.setProperty('--shine-y', '50%');
+
+                if (!rafId) {
+                    rafId = requestAnimationFrame(animate);
+                }
+            }
+        }
+
+        // Events on STATIONARY wrapper (profile-wrapper) - prevents edge flickering
+        profileWrapper.addEventListener('mousemove', handleMouseMove);
+        profileWrapper.addEventListener('mouseleave', handleMouseLeave);
+
+        // Global events for reset
+        window.addEventListener('blur', handleBlur);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // Cleanup function - called on page unload or when effect is disabled
+        function cleanup() {
+            if (rafId) cancelAnimationFrame(rafId);
+            profileWrapper.removeEventListener('mousemove', handleMouseMove);
+            profileWrapper.removeEventListener('mouseleave', handleMouseLeave);
+            window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('scroll', handleScroll);
+
+            // Reset all CSS variables
+            profileTiltInner.style.removeProperty('--tilt-x');
+            profileTiltInner.style.removeProperty('--tilt-y');
+            profileWrapper.style.removeProperty('--glow-x');
+            profileWrapper.style.removeProperty('--glow-y');
+            profileWrapper.style.removeProperty('--shine-x');
+            profileWrapper.style.removeProperty('--shine-y');
+        }
+
+        // Store cleanup for potential future use (e.g., theme toggle re-init)
+        profileWrapper._tiltCleanup = cleanup;
+
+        return cleanup;
     }
 
     function initKeyboardNavigation() {

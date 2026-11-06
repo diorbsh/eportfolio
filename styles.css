@@ -4,6 +4,8 @@
     --color-primary-light: rgba(0, 0, 0, 0.08);
     --color-secondary: #666666;
     --color-secondary-hover: #555555;
+    --color-accent: #4da6ff;
+    --color-accent-rgb: 77, 166, 255;
 
     --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
@@ -55,6 +57,8 @@
     --color-primary-light: rgba(255, 255, 255, 0.1);
     --color-secondary: #999999;
     --color-secondary-hover: #aaaaaa;
+    --color-accent: #4da6ff;
+    --color-accent-rgb: 77, 166, 255;
     --color-spotlight: 77, 166, 255;
 }
 
@@ -72,6 +76,8 @@
     --color-overlay: rgba(255, 255, 255, 0.9);
     --color-code-bg: #f5f5f5;
     --color-code-text: #1d1d1f;
+    --color-accent: #0066cc;
+    --color-accent-rgb: 0, 102, 204;
     --color-spotlight: 0, 102, 204;
 }
 
@@ -601,6 +607,142 @@ input, textarea {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* Profile Photo Tilt & Glow Effect */
+.profile-wrapper {
+    position: relative;
+    perspective: 1000px;
+    /* Stationary wrapper for mouse events - prevents edge flickering */
+}
+
+/* Inner container that actually tilts - prevents layout shift */
+.profile-tilt-inner {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform var(--transition-slow);
+    will-change: transform;
+    /* CSS variables for tilt, set by JS */
+    transform: perspective(1000px)
+        rotateX(var(--tilt-x, 0deg))
+        rotateY(var(--tilt-y, 0deg));
+}
+
+.profile-image {
+    width: 320px;
+    height: 320px;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--color-border);
+    transition:
+        box-shadow var(--transition-base),
+        border-color var(--transition-base);
+    display: block;
+}
+
+/* Glow ring using ::before for smooth animation */
+.profile-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: calc(var(--radius-xl) + 4px);
+    background: radial-gradient(
+        ellipse at var(--glow-x, 50%) var(--glow-y, 50%),
+        var(--color-accent) 0%,
+        transparent 70%
+    );
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Shine/glint effect using ::after - follows mouse subtly */
+.profile-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(
+        110deg,
+        transparent 40%,
+        rgba(var(--color-accent-rgb), 0.08) 50%,
+        transparent 60%
+    );
+    background-size: 200% 200%;
+    background-position: var(--shine-x, -100%) var(--shine-y, -100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Hover state: glow and shine appear */
+@media (hover: hover) and (pointer: fine) {
+    .profile-wrapper:hover::before {
+        opacity: 0.35;
+    }
+
+    .profile-wrapper:hover::after {
+        opacity: 1;
+    }
+
+    .profile-wrapper:hover .profile-image {
+        box-shadow: var(--shadow-xl), 0 0 40px rgba(var(--color-accent-rgb), 0.25);
+        border-color: var(--color-accent);
+    }
+}
+
+/* Reduced motion: disable tilt and shine, keep subtle glow */
+@media (prefers-reduced-motion: reduce) {
+    .profile-tilt-inner {
+        transition: none;
+        transform: none !important;
+    }
+
+    .profile-wrapper::after {
+        display: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .profile-wrapper:hover::before {
+            opacity: 0.2;
+        }
+
+        .profile-wrapper:hover .profile-image {
+            box-shadow: var(--shadow-xl), 0 0 30px rgba(var(--color-accent-rgb), 0.15);
+            border-color: var(--color-accent);
+        }
+    }
+}
+
+/* Light mode: more subtle glow and shine */
+[data-theme="light"] .profile-wrapper::before {
+    background: radial-gradient(
+        ellipse at var(--glow-x, 50%) var(--glow-y, 50%),
+        var(--color-accent) 0%,
+        transparent 60%
+    );
+}
+
+[data-theme="light"] .profile-wrapper:hover::before {
+    opacity: 0.2;
+}
+
+[data-theme="light"] .profile-wrapper:hover .profile-image {
+    box-shadow: var(--shadow-xl), 0 0 30px rgba(var(--color-accent-rgb), 0.12);
+}
+
+[data-theme="light"] .profile-wrapper::after {
+    background: linear-gradient(
+        110deg,
+        transparent 40%,
+        rgba(var(--color-accent-rgb), 0.05) 50%,
+        transparent 60%
+    );
 }
 
 .code-window {

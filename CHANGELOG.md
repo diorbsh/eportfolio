@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2025-11-06
+
+### Added
+- **Hero Photo 3D Tilt & Glow Effect** — Interactive 3D tilt on profile photo with glowing ring and moving shine:
+  - Smooth 3D tilt following mouse direction (max 8° per axis) with perspective
+  - Subtle glow ring in accent color appearing on hover, fading smoothly in/out
+  - Optional shine/glint effect following mouse position across the photo surface
+  - Automatic reset on mouse leave, window blur, and when Hero scrolls out of viewport
+  - Full `prefers-reduced-motion` support: tilt and shine disabled, subtle glow retained
+  - Touch-friendly: effect only enabled for fine pointers with hover capability (`@media (hover: hover) and (pointer: fine)`)
+  - Theme-aware: accent colors adapt live to Dark/Light mode toggle via CSS variables
+  - No layout shift: photo maintains exact size and position in rest state and during hover
+  - No flickering: mouse events on stationary wrapper (`.profile-wrapper`), tilt applied to inner container (`.profile-tilt-inner`)
+  - Performance: `requestAnimationFrame` with smooth interpolation, `will-change` only during active hover
+  - Cleanup: listeners and animation frames properly removed on page unload
+
+### Technical Details
+- Vanilla JS implementation with CSS Custom Properties for transform/glow/shine positions
+- Events attached to stationary wrapper to prevent edge-flickering (Errorquelle #1)
+- Direct DOM style manipulation via `element.style.setProperty()` — no React state / no re-renders (Errorquelle #2)
+- `cancelAnimationFrame` + `removeEventListener` on `beforeunload` and unmount (Errorquelle #3)
+- `will-change: transform` only on inner tilt container during animation, removed at rest (Errorquelle #4)
+- Glow (`::before`) and shine (`::after`) overlays with `pointer-events: none`, correct `z-index`, no click interception (Errorquelle #5)
+- No size change, no scrollbar, no overlap with text column (Errorquelle #6)
+- Reset triggers: `mouseleave`, `window blur`, Hero out of viewport via `scroll` listener (Errorquelle #7)
+- Touch devices: effect completely disabled via media query (Errorquelle #8)
+- `prefers-reduced-motion`: tilt + shine off, subtle glow only (Errorquelle #9)
+- Theme toggle: glow/shine colors update live via `--color-accent` / `--color-accent-rgb` CSS variables (Errorquelle #10)
+- Coexists with card spotlight, typing effect, parallax, and Three.js canvas without interference (Errorquelle #11)
+
+### Documentation
+- Added `docs/photo-tilt-effect.md` with implementation details and customization guide
+
 ## [1.1.0] - 2025-11-05
 
 ### Added
