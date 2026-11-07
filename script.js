@@ -4,6 +4,9 @@
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
+    // View Transition state
+    let themeTransitionActive = false;
+
     const state = {
         theme: 'light',
         scrollY: 0,
@@ -228,13 +231,103 @@
         const toggle = document.getElementById('themeToggle');
         if (!toggle) return;
 
+        // Circular theme transition using View Transitions API
+        function toggleThemeWithTransition(button, newTheme) {
+            // Skip if transition already in progress
+            if (themeTransitionActive) return;
+
+            // Respect prefers-reduced-motion
+            if (prefersReducedMotion) {
+                applyTheme(newTheme);
+                return;
+            }
+
+            // Check for View Transitions API support
+            if (!document.startViewTransition) {
+                applyTheme(newTheme);
+                return;
+            }
+
+            themeTransitionActive = true;
+
+            // Calculate center of button
+            const rect = button.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Calculate radius to furthest corner of viewport
+            const maxX = Math.max(centerX, window.innerWidth - centerX);
+            const maxY = Math.max(centerY, window.innerHeight - centerY);
+            const radius = Math.hypot(maxX, maxY);
+
+            // Create clip-path for the circular reveal
+            const clipPathStart = `circle(0px at ${centerX}px ${centerY}px)`;
+            const clipPathEnd = `circle(${radius}px at ${centerX}px ${centerY}px)`;
+
+            // Disable CSS transitions during view transition to prevent interference
+            document.documentElement.classList.add('theme-transitioning');
+
+            try {
+                const transition = document.startViewTransition(() => {
+                    applyTheme(newTheme);
+                });
+
+                // Wait for the transition to be ready (DOM updated)
+                transition.ready.then(() => {
+                    // Animate the clip-path on the new root
+                    const newRoot = document.documentElement;
+                    newRoot.animate(
+                        [
+                            { clipPath: clipPathStart },
+                            { clipPath: clipPathEnd }
+                        ],
+                        {
+                            duration: 600,
+                            easing: 'ease-in-out',
+                            pseudoElement: '::view-transition-new(root)'
+                        }
+                    ).finished.then(() => {
+                        // Clean up
+                        document.documentElement.classList.remove('theme-transitioning');
+                        themeTransitionActive = false;
+                    }).catch(() => {
+                        // Clean up on error/abort
+                        document.documentElement.classList.remove('theme-transitioning');
+                        themeTransitionActive = false;
+                    });
+                }).catch(() => {
+                    // Clean up if transition.ready fails
+                    document.documentElement.classList.remove('theme-transitioning');
+                    themeTransitionActive = false;
+                });
+
+                // Handle rapid clicks - skip transition if another click comes in
+                transition.finished.then(() => {
+                    themeTransitionActive = false;
+                }).catch(() => {
+                    themeTransitionActive = false;
+                });
+
+            } catch (error) {
+                // Fallback if View Transition fails
+                document.documentElement.classList.remove('theme-transitioning');
+                themeTransitionActive = false;
+                applyTheme(newTheme);
+            }
+        }
+
         toggle.addEventListener('click', () => {
             const newTheme = state.theme === 'dark' ? 'light' : 'dark';
-            toggle.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                toggle.style.transform = 'scale(1)';
-            }, 150);
-            applyTheme(newTheme);
+            toggleThemeWithTransition(toggle, newTheme);
+        });
+
+        // Keyboard support - Enter/Space triggers same transition
+        toggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const newTheme = state.theme === 'dark' ? 'light' : 'dark';
+                toggleThemeWithTransition(toggle, newTheme);
+            }
         });
 
         prefersDarkScheme.addEventListener('change', (e) => {

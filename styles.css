@@ -105,6 +105,21 @@ html {
     }
 }
 
+/* View Transition for Theme Toggle - Circular Reveal */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+/* Disable CSS transitions during theme transition to prevent interference */
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+}
+
 body {
     font-family: var(--font-sans);
     font-size: 1rem;

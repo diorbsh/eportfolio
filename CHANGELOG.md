@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2025-11-07
+
+### Added
+- **Circular Theme Transition** — Theme toggle now animates via View Transitions API:
+  - Circular reveal expanding from button center to cover full viewport (~600ms, ease-in-out)
+  - Works bidirectionally (Dark→Light and Light→Dark)
+  - Keyboard accessible: Enter/Space on button triggers same animation
+  - Radius calculated via `Math.hypot()` to reach furthest viewport corner (no corner left behind)
+  - Fallback: instant switch if View Transitions API unavailable (no errors, no warnings)
+  - Respects `prefers-reduced-motion: reduce` (instant switch)
+  - Rapid clicks ignored during active transition (no state corruption)
+  - Fixed header with backdrop-filter blur remains stable, no flicker
+  - Scroll position preserved exactly, no layout shift
+  - Typing effect, Three.js canvas, and all other animations continue uninterrupted
+  - `aria-pressed` and `aria-label` stay in sync with current theme
+  - Focus remains on button, focus ring visible throughout
+
+### Technical Details
+- **View Transitions API** — Uses `document.startViewTransition()` with clip-path animation on `::view-transition-new(root)`
+- **Default VT animation disabled** — `::view-transition-old/new(root)` get `animation: none; mix-blend-mode: normal`
+- **CSS transitions paused** — Temporary `.theme-transitioning` class on `<html>` sets `transition-duration: 0.01ms !important`
+- **Center calculation** — `getBoundingClientRect()` on button (works for desktop, mobile, keyboard)
+- **Cleanup** — `themeTransitionActive` flag, all promises caught, class removed, no memory leaks
+- **Vanilla JS** — No dependencies, no React state, no re-renders
+
+### Documentation
+- Added `docs/theme-transition.md` with implementation details, customization guide, browser support table, and testing checklist
+
 ## [1.3.0] - 2025-11-06
 
 ### Added
