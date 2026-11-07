@@ -939,12 +939,22 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
 
         function showFormStatus(message, type) {
             formStatus.textContent = message;
-            formStatus.className = 'form-status visible ' + type;
+            formStatus.hidden = false;
+            formStatus.className = 'form-status ' + type;
+            // Trigger animation via requestAnimationFrame
+            requestAnimationFrame(() => {
+                formStatus.classList.add('visible');
+            });
         }
 
         function hideFormStatus() {
             formStatus.classList.remove('visible', 'success', 'error');
-            formStatus.textContent = '';
+            // Wait for transition to complete before hiding
+            formStatus.addEventListener('transitionend', function handler() {
+                formStatus.hidden = true;
+                formStatus.textContent = '';
+                formStatus.removeEventListener('transitionend', handler);
+            }, { once: true });
         }
 
         // Reset loading state - ALWAYS called via finally
