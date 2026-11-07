@@ -19,8 +19,6 @@
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=2">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Timeline React Component Styles -->
-    <link rel="stylesheet" href="timeline.css">
 </head>
 <body>
     <a href="#main" class="skip-link">Zum Hauptinhalt springen</a>
@@ -321,21 +319,27 @@
                     </div>
 
                     <form class="contact-form" id="contactForm" novalidate>
+                        <!-- Honeypot field for spam protection (hidden via CSS) -->
+                        <div class="form-honeypot" aria-hidden="true">
+                            <label for="website">Website</label>
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                        </div>
+
                         <div class="form-content">
                             <div class="form-group">
-                                <label for="name">Dein Name</label>
-                                <input type="text" id="name" name="name" required placeholder="Wie heißt du?" autocomplete="name">
-                                <span class="form-error" aria-live="polite"></span>
+                                <label for="name">Dein Name <span class="required" aria-hidden="true">*</span></label>
+                                <input type="text" id="name" name="name" required placeholder="Wie heißt du?" autocomplete="name" aria-describedby="name-error">
+                                <span id="name-error" class="form-error" aria-live="polite"></span>
                             </div>
                             <div class="form-group">
-                                <label for="email">E-Mail / Telefon</label>
-                                <input type="text" id="email" name="email" required placeholder="Wie kann ich dich erreichen?" autocomplete="email">
-                                <span class="form-error" aria-live="polite"></span>
+                                <label for="email">E-Mail / Telefon <span class="required" aria-hidden="true">*</span></label>
+                                <input type="text" id="email" name="email" required placeholder="Wie kann ich dich erreichen?" autocomplete="email" aria-describedby="email-error">
+                                <span id="email-error" class="form-error" aria-live="polite"></span>
                             </div>
                             <div class="form-group">
-                                <label for="message">Nachricht</label>
-                                <textarea id="message" name="message" rows="5" required placeholder="Schick mir deine Anfragen oder Fragen"></textarea>
-                                <span class="form-error" aria-live="polite"></span>
+                                <label for="message">Nachricht <span class="required" aria-hidden="true">*</span></label>
+                                <textarea id="message" name="message" rows="5" required placeholder="Schick mir deine Anfragen oder Fragen" aria-describedby="message-error"></textarea>
+                                <span id="message-error" class="form-error" aria-live="polite"></span>
                             </div>
 
                             <div id="formStatus" class="form-status" aria-live="polite" role="status"></div>
@@ -385,11 +389,6 @@
         </div>
     </footer>
 
-    <!-- React CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Portfolio Timeline Component (with all dependencies bundled) -->
-    <script src="timeline.umd.js"></script>
     <!-- Hero 3D Scene (Three.js) -->
     <script src="js/hero-3d.js"></script>
     <script src="script.js"></script>

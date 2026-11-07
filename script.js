@@ -134,43 +134,78 @@
         ]
     };
 
-    const timelineData = [
-        {
-            date: 'Jul 2025 – heute',
-            title: 'QMS Process Manager',
-            company: 'Altstätten, Sankt Gallen, Schweiz',
-            description: 'Prozessmanagement, Prozessoptimierung, Qualitätsmanagement (ISO 9001), BPMN, Projektmanagement',
-            icon: 'briefcase'
-        },
-        {
-            date: 'Feb 2025 – Jul 2025',
-            title: 'Video Editor',
-            company: 'Sankt Gallen, Schweiz',
-            description: 'Videoschnitt, Videoproduktion, CapCut Pro, Content-Produktion',
-            icon: 'briefcase'
-        },
-        {
-            date: 'Jan 2024 – Mai 2024',
-            title: 'Rekrutenschule',
-            company: 'Frauenfeld, Thurgau, Schweiz',
-            description: 'Teamführung, Belastbarkeit, Kommunikationstechnik, Krisenmanagement',
-            icon: 'briefcase'
-        },
-        {
-            date: 'Sep 2023 – Nov 2023',
-            title: 'Softwareentwickler',
-            company: 'Altstätten, Sankt Gallen, Schweiz',
-            description: 'Mobile App Development, C# / Xamarin, Web Development, FileZilla, WordPress, PHP',
-            icon: 'briefcase'
-        },
-        {
-            date: 'Aug 2022 – Jul 2023',
-            title: 'Software Entwickler – Praktikum',
-            company: 'Diepoldsau, Sankt Gallen, Schweiz',
-            description: 'App-Entwicklung, Technische Dokumentation, Cloud-Computing, IoT, MQTT, C++, Python, TortoiseSVN',
-            icon: 'briefcase'
-        }
-    ];
+    // Experience Timeline Data (shared with React component)
+// Order: oldest first (index 0) → newest last (index 4)
+const experienceData = [
+    {
+        id: 'praktikum',
+        date: 'Aug 2022 – Jul 2023',
+        yearLabel: '2022–2023',
+        title: 'Software Entwickler – Praktikum',
+        company: 'Diepoldsau, Sankt Gallen, Schweiz',
+        description: 'App-Entwicklung, Technische Dokumentation, Cloud-Computing, IoT, MQTT, C++, Python, TortoiseSVN',
+        icon: 'cogs',
+        color: '#ff6b35',
+        category: 'work',
+        badge: { label: 'Praktikum', icon: 'cogs' },
+        skills: ['App-Entwicklung', 'Technische Dokumentation', 'Cloud-Computing', 'IoT', 'MQTT', 'C++', 'Python', 'TortoiseSVN']
+    },
+    {
+        id: 'softwareentwickler',
+        date: 'Sep 2023 – Nov 2023',
+        yearLabel: '2023',
+        title: 'Softwareentwickler',
+        company: 'Altstätten, Sankt Gallen, Schweiz',
+        description: 'Mobile App Development, C# / Xamarin, Web Development, FileZilla, WordPress, PHP',
+        icon: 'code',
+        color: '#0071e3',
+        category: 'work',
+        badge: { label: 'Vollzeit', icon: 'briefcase' },
+        skills: ['Mobile App Development', 'C# / Xamarin', 'Web Development', 'FileZilla', 'WordPress', 'PHP']
+    },
+    {
+        id: 'rekrutenschule',
+        date: 'Jan 2024 – Mai 2024',
+        yearLabel: '2024',
+        title: 'Rekrutenschule',
+        company: 'Frauenfeld, Thurgau, Schweiz',
+        description: 'Teamführung, Belastbarkeit, Kommunikationstechnik, Krisenmanagement',
+        icon: 'graduation-cap',
+        color: '#34c759',
+        category: 'education',
+        badge: { label: 'Ausbildung', icon: 'graduation-cap' },
+        skills: ['Teamführung', 'Belastbarkeit', 'Kommunikationstechnik', 'Krisenmanagement']
+    },
+    {
+        id: 'video-editor',
+        date: 'Feb 2025 – Jul 2025',
+        yearLabel: '2025',
+        title: 'Video Editor',
+        company: 'Sankt Gallen, Schweiz',
+        description: 'Videoschnitt, Videoproduktion, CapCut Pro, Content-Produktion',
+        icon: 'play',
+        color: '#5000ca',
+        category: 'work',
+        badge: { label: 'Content Creation', icon: 'award' },
+        skills: ['Videoschnitt', 'Videoproduktion', 'CapCut Pro', 'Content-Produktion']
+    },
+    {
+        id: 'qms-process-manager',
+        date: 'Jul 2025 – heute',
+        yearLabel: '2025–heute',
+        title: 'QMS Process Manager',
+        company: 'Altstätten, Sankt Gallen, Schweiz',
+        description: 'Prozessmanagement, Prozessoptimierung, Qualitätsmanagement (ISO 9001), BPMN, Projektmanagement',
+        icon: 'briefcase',
+        color: '#5000ca',
+        category: 'work',
+        badge: { label: 'Qualitätsmanagement', icon: 'certificate' },
+        skills: ['Prozessmanagement', 'Prozessoptimierung', 'Qualitätsmanagement (ISO 9001)', 'BPMN', 'Projektmanagement']
+    }
+];
+
+// Default open index (newest = last)
+const DEFAULT_OPEN_INDEX = experienceData.length - 1;
 
     function init() {
         loadTheme();
@@ -196,9 +231,14 @@
         state.projects = projectsData;
         renderProjects();
         renderSkills();
-        // renderTimeline() - now handled by React component
+        const timelineCleanup = initExperienceTimeline();
 
         document.documentElement.classList.add('js-loaded');
+
+        // Cleanup on page unload
+        if (timelineCleanup) {
+            window.addEventListener('beforeunload', timelineCleanup, { once: true });
+        }
 
         // Cleanup on page unload (handles StrictMode-like double-init in dev)
         if (photoTiltCleanup) {
@@ -578,23 +618,192 @@
         });
     }
 
-    function renderTimeline() {
-        const container = document.getElementById('timeline');
+    // ============ NEW VANILLA JS EXPERIENCE TIMELINE ============
+    // Mobile: vertical accordion | Desktop: compact horizontal two-column
+    function initExperienceTimeline() {
+        const container = document.getElementById('timeline-react-root') || document.getElementById('timeline');
         if (!container) return;
 
-        container.innerHTML = timelineData.map((item, index) => `
-            <article class="timeline-item" style="animation-delay: ${index * 150}ms" data-animate="fade-up">
-                <div class="timeline-marker" style="background: ${item.color};">
-                    <i class="fas fa-${item.icon}" aria-hidden="true"></i>
+        let openIndex = DEFAULT_OPEN_INDEX;
+        let isDesktop = window.innerWidth >= 768;
+
+        // Create timeline HTML
+        function render() {
+            const itemsHtml = experienceData.map((item, index) => {
+                const isOpen = index === openIndex;
+                const isNewest = index === DEFAULT_OPEN_INDEX;
+                const skillsHtml = item.skills.slice(0, 3).map(skill =>
+                    `<span class="timeline-skill">${skill}</span>`
+                ).join('');
+                const extraSkills = item.skills.length > 3 ?
+                    `<span class="timeline-skill timeline-skill-more">+${item.skills.length - 3}</span>` : '';
+
+                return `
+                    <article class="timeline-item ${item.category} ${isOpen ? 'open' : ''}"
+                             data-index="${index}"
+                             data-animate="fade-up"
+                             style="animation-delay: ${index * 100}ms">
+                        <div class="timeline-marker" style="background: ${item.color};">
+                            <i class="fas fa-${item.icon}" aria-hidden="true"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <header class="timeline-header">
+                                <div class="timeline-date">${item.date}</div>
+                                <div class="timeline-main">
+                                    <h3 class="timeline-title">${item.title}</h3>
+                                    <h4 class="timeline-company">${item.company}</h4>
+                                </div>
+                                ${item.badge ? `
+                                    <span class="timeline-badge" style="background: ${item.color};">
+                                        <i class="fas fa-${item.badge.icon}" aria-hidden="true"></i>
+                                        ${item.badge.label}
+                                    </span>
+                                ` : ''}
+                            </header>
+                            <div class="timeline-details" hidden=${!isOpen}>
+                                <p class="timeline-description">${item.description}</p>
+                                <div class="timeline-skills">
+                                    ${skillsHtml}
+                                    ${extraSkills}
+                                </div>
+                            </div>
+                            <button type="button"
+                                    class="timeline-toggle"
+                                    aria-expanded="${isOpen}"
+                                    aria-controls="timeline-details-${item.id}"
+                                    data-index="${index}">
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                                <span class="sr-only">${isOpen ? 'Details ausblenden' : 'Details anzeigen'}</span>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="timeline-container" role="list" aria-label="Berufserfahrung">
+                    ${itemsHtml}
                 </div>
-                <div class="timeline-content">
-                    <div class="timeline-date">${item.date}</div>
-                    <h3 class="timeline-title">${item.title}</h3>
-                    <h4 class="timeline-company">${item.company}</h4>
-                    <p class="timeline-description">${item.description}</p>
-                </div>
-            </article>
-        `).join('');
+            `;
+
+            attachListeners();
+        }
+
+        function attachListeners() {
+            const items = container.querySelectorAll('.timeline-item');
+            const toggles = container.querySelectorAll('.timeline-toggle');
+
+            toggles.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const index = parseInt(btn.dataset.index, 10);
+                    toggleItem(index);
+                });
+
+                // Keyboard support
+                btn.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const index = parseInt(btn.dataset.index, 10);
+                        toggleItem(index);
+                    }
+                });
+            });
+
+            // Allow clicking on header to toggle (desktop)
+            if (isDesktop) {
+                items.forEach(item => {
+                    const header = item.querySelector('.timeline-header');
+                    if (header) {
+                        header.addEventListener('click', () => {
+                            const index = parseInt(item.dataset.index, 10);
+                            toggleItem(index);
+                        });
+                    }
+                });
+            }
+
+            // Arrow key navigation between items
+            container.addEventListener('keydown', (e) => {
+                if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+                e.preventDefault();
+
+                const itemsArray = Array.from(items);
+                const currentFocus = document.activeElement;
+                let currentIndex = itemsArray.findIndex(item =>
+                    item.contains(currentFocus) || item.querySelector('.timeline-toggle') === currentFocus
+                );
+
+                if (currentIndex === -1) currentIndex = openIndex;
+
+                let newIndex = currentIndex;
+                if (e.key === 'ArrowDown') newIndex = Math.min(currentIndex + 1, itemsArray.length - 1);
+                else if (e.key === 'ArrowUp') newIndex = Math.max(currentIndex - 1, 0);
+                else if (e.key === 'Home') newIndex = 0;
+                else if (e.key === 'End') newIndex = itemsArray.length - 1;
+
+                if (newIndex !== currentIndex) {
+                    itemsArray[newIndex].querySelector('.timeline-toggle').focus();
+                }
+            });
+        }
+
+        function toggleItem(index) {
+            if (index === openIndex) return; // Already open
+
+            const items = container.querySelectorAll('.timeline-item');
+            const prevOpen = items[openIndex];
+            const newOpen = items[index];
+
+            if (!newOpen) return;
+
+            // Close previous
+            if (prevOpen) {
+                prevOpen.classList.remove('open');
+                const prevDetails = prevOpen.querySelector('.timeline-details');
+                const prevToggle = prevOpen.querySelector('.timeline-toggle');
+                if (prevDetails) prevDetails.hidden = true;
+                if (prevToggle) prevToggle.setAttribute('aria-expanded', 'false');
+            }
+
+            // Open new
+            newOpen.classList.add('open');
+            const newDetails = newOpen.querySelector('.timeline-details');
+            const newToggle = newOpen.querySelector('.timeline-toggle');
+            if (newDetails) newDetails.hidden = false;
+            if (newToggle) newToggle.setAttribute('aria-expanded', 'true');
+
+            openIndex = index;
+
+            // Smooth scroll to new open item on mobile
+            if (!isDesktop) {
+                newOpen.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Handle resize - switch between mobile/desktop mode
+        let resizeTimer = null;
+        function handleResize() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const wasDesktop = isDesktop;
+                isDesktop = window.innerWidth >= 768;
+                if (wasDesktop !== isDesktop) {
+                    render(); // Re-render for mode change
+                }
+            }, 100);
+        }
+
+        window.addEventListener('resize', handleResize, { passive: true });
+
+        // Initial render
+        render();
+
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (resizeTimer) clearTimeout(resizeTimer);
+        };
     }
 
     function initCounterAnimation() {
@@ -651,7 +860,7 @@
 
         const RECEIVER_EMAIL = 'diorbushati@gmail.com';
         const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECEIVER_EMAIL}`;
-        const SUBMIT_TIMEOUT = 15000; // 15 seconds timeout
+        const SUBMIT_TIMEOUT = 10000; // 10 seconds timeout
 
         // Form elements
         const formContent = form.querySelector('.form-content');
@@ -664,6 +873,7 @@
         const resetFormBtn = form.querySelector('#resetFormBtn');
         const retryBtn = form.querySelector('#retryBtn');
         const successContactValue = form.querySelector('.success-contact-value');
+        const honeypotInput = form.querySelector('#website');
 
         // Field elements
         const nameInput = form.querySelector('#name');
@@ -735,6 +945,15 @@
         function hideFormStatus() {
             formStatus.classList.remove('visible', 'success', 'error');
             formStatus.textContent = '';
+        }
+
+        // Reset loading state - ALWAYS called via finally
+        function resetLoadingState() {
+            isSubmitting = false;
+            form.classList.remove('submitting');
+            btnText.hidden = false;
+            btnLoading.hidden = true;
+            submitBtn.disabled = false;
         }
 
         // Success view
@@ -827,6 +1046,12 @@
 
             if (isSubmitting) return;
 
+            // Honeypot check - if filled, silently ignore (spam bot)
+            if (honeypotInput && honeypotInput.value.trim() !== '') {
+                console.log('Honeypot triggered, ignoring submission');
+                return;
+            }
+
             // Validate all fields
             clearAllErrors();
             let allValid = true;
@@ -870,9 +1095,6 @@
                     signal: controller.signal,
                 });
 
-                clearTimeout(submitTimeoutId);
-                submitTimeoutId = null;
-
                 if (!response.ok) {
                     throw new Error(`Server responded with ${response.status}`);
                 }
@@ -881,16 +1103,18 @@
                 showSuccess(contactValue);
 
             } catch (error) {
-                clearTimeout(submitTimeoutId);
-                submitTimeoutId = null;
-
-                // Don't show error if aborted (shouldn't happen with our timeout)
+                // Don't show error if aborted (timeout)
                 if (error.name === 'AbortError') {
-                    showErrorState();
+                    showFormStatus('Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.', 'error');
                 } else {
                     console.error('Form submission failed:', error);
                     showErrorState();
                 }
+            } finally {
+                // ALWAYS reset loading state - critical fix for stuck spinner
+                clearTimeout(submitTimeoutId);
+                submitTimeoutId = null;
+                resetLoadingState();
             }
         }
 
