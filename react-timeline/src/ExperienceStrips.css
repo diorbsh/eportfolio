@@ -1,0 +1,324 @@
+/* Experience Strips - Expanding Strips Layout */
+/* Fünf farbige Streifen nebeneinander, Hover klappt Details aus */
+
+.experience-strips-container {
+  width: 100%;
+  max-width: var(--container-max, 1200px);
+  margin: 0 auto;
+  padding: 0 var(--container-padding, 24px);
+}
+
+/* Haupt-Container: Flexbox mit fester Höhe */
+.experience-strips {
+  display: flex;
+  flex-direction: row;
+  height: 260px;
+  gap: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Einzelner Streifen */
+.experience-strip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  border-radius: 12px;
+  background: var(--strip-color);
+  color: white;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  transition:
+    flex-grow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    flex-basis 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover/Fokus/Active Zustand - flex-grow steuert die Breite */
+.experience-strip:hover,
+.experience-strip:focus,
+.experience-strip.active {
+  flex-grow: 5;
+  z-index: 10;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.experience-strip:focus-visible {
+  outline: 3px solid var(--strip-color);
+  outline-offset: -3px;
+}
+
+/* Icon oben im Streifen */
+.strip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 70px;
+  padding: 16px;
+  flex-shrink: 0;
+}
+
+.strip-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* Ausgeklappter Inhalt */
+.strip-content {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0 16px 16px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px);
+  transition:
+    opacity 0.3s ease 0.1s,
+    visibility 0s linear 0.4s,
+    transform 0.3s ease 0.1s;
+  pointer-events: none;
+}
+
+/* Wenn Streifen aktiv: Inhalt einblenden */
+.experience-strip.active .strip-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition-delay: 0.15s;
+  pointer-events: auto;
+}
+
+.strip-content-inner {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.strip-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Badge im ausgeklappten Zustand */
+.strip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: white;
+  background: var(--strip-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.strip-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+  color: white;
+}
+
+.strip-company {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.strip-date {
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.strip-description {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Skills Tags */
+.strip-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.strip-skill {
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* Eingeklappt: Senkrechtes Jahr-Label unten */
+.strip-year {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.strip-year span {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Wenn Streifen aktiv: Jahr-Label ausblenden */
+.experience-strip.active .strip-year {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Einblend-Animation beim Mount */
+.experience-strips-container {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: stripsFadeIn 0.6s ease forwards;
+}
+
+.experience-strips-container:nth-child(1) { animation-delay: 0ms; }
+.experience-strips-container:nth-child(2) { animation-delay: 100ms; }
+
+@keyframes stripsFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive: Unter 768px wird zu vertikaler Liste (M3) */
+@media (max-width: 768px) {
+  .experience-strips {
+    flex-direction: column;
+    height: auto;
+    min-height: auto;
+    gap: 10px;
+  }
+
+  .experience-strip {
+    flex-grow: 1 !important;
+    flex-basis: auto !important;
+    min-height: 60px;
+    max-height: 60px;
+    border-radius: 12px;
+    transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .experience-strip.active {
+    max-height: 380px;
+    flex-grow: 1 !important;
+  }
+
+  .strip-icon {
+    height: 60px;
+  }
+
+  .strip-content {
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    padding: 0 16px;
+    transition:
+      opacity 0.3s ease,
+      max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      visibility 0s linear 0.4s;
+  }
+
+  .experience-strip.active .strip-content {
+    opacity: 1;
+    visibility: visible;
+    max-height: 320px;
+    padding: 0 16px 16px;
+    transition-delay: 0.1s;
+  }
+
+  .strip-year {
+    display: none;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .experience-strip,
+  .strip-content,
+  .strip-year,
+  .experience-strips-container {
+    animation: none;
+    transition: none !important;
+  }
+
+  .experience-strips-container {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .experience-strips {
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+  }
+
+  .experience-strip {
+    flex-grow: 1 !important;
+    flex-basis: auto !important;
+    min-height: auto;
+    max-height: none;
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .strip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    max-height: none;
+  }
+
+  .strip-year {
+    display: none;
+  }
+}

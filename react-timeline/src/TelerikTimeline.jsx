@@ -1,60 +1,7 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBriefcase, faGraduationCap, faCode, faCogs, faCertificate, faPlay, faAward } from '@fortawesome/free-solid-svg-icons'
+import { experienceDataReversed } from './experienceData'
 import './TelerikTimeline.css'
-
-const timelineData = [
-  {
-    date: 'Jul 2025 – heute',
-    title: 'QMS Process Manager',
-    company: 'Altstätten, Sankt Gallen, Schweiz',
-    description: 'Prozessmanagement, Prozessoptimierung, Qualitätsmanagement (ISO 9001), BPMN, Projektmanagement',
-    icon: faBriefcase,
-    color: '#5000ca',
-    category: 'work',
-    badge: { label: 'Qualitätsmanagement', icon: faCertificate }
-  },
-  {
-    date: 'Feb 2025 – Jul 2025',
-    title: 'Video Editor',
-    company: 'Sankt Gallen, Schweiz',
-    description: 'Videoschnitt, Videoproduktion, CapCut Pro, Content-Produktion',
-    icon: faPlay,
-    color: '#5000ca',
-    category: 'work',
-    badge: { label: 'Content Creation', icon: faAward }
-  },
-  {
-    date: 'Jan 2024 – Mai 2024',
-    title: 'Rekrutenschule',
-    company: 'Frauenfeld, Thurgau, Schweiz',
-    description: 'Teamführung, Belastbarkeit, Kommunikationstechnik, Krisenmanagement',
-    icon: faGraduationCap,
-    color: '#34c759',
-    category: 'education',
-    badge: { label: 'Ausbildung', icon: faGraduationCap }
-  },
-  {
-    date: 'Sep 2023 – Nov 2023',
-    title: 'Softwareentwickler',
-    company: 'Altstätten, Sankt Gallen, Schweiz',
-    description: 'Mobile App Development, C# / Xamarin, Web Development, FileZilla, WordPress, PHP',
-    icon: faCode,
-    color: '#0071e3',
-    category: 'work',
-    badge: { label: 'Vollzeit', icon: faBriefcase }
-  },
-  {
-    date: 'Aug 2022 – Jul 2023',
-    title: 'Software Entwickler – Praktikum',
-    company: 'Diepoldsau, Sankt Gallen, Schweiz',
-    description: 'App-Entwicklung, Technische Dokumentation, Cloud-Computing, IoT, MQTT, C++, Python, TortoiseSVN',
-    icon: faCogs,
-    color: '#ff6b35',
-    category: 'work',
-    badge: { label: 'Praktikum', icon: faCogs }
-  }
-]
 
 function TelerikTimeline() {
   return (
@@ -65,12 +12,12 @@ function TelerikTimeline() {
 
         {/* Timeline items */}
         <div className="timeline-items">
-          {timelineData.map((item, index) => (
+          {experienceDataReversed.map((item, index) => (
             <TimelineItem
-              key={index}
+              key={item.id}
               item={item}
               index={index}
-              isLast={index === timelineData.length - 1}
+              isLast={index === experienceDataReversed.length - 1}
             />
           ))}
         </div>

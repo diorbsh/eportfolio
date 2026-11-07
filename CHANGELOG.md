@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2025-11-07
+
+### Added
+- **Experience Strips (M1: Data & Desktop Layout)** — Replaces vertical Telerik timeline with horizontal expanding strips:
+  - Five horizontal strips (oldest left → newest right), each with distinct accent color
+  - Hover/tap expands strip to 5× width via `flex-grow` transition (0.4s, cubic-bezier)
+  - Vertical year labels using `writing-mode: vertical-rl` + `rotate(180deg)` on collapsed strips
+  - Newest strip (index 4) open by default
+  - Full keyboard navigation: ArrowLeft/Right, Home, End, Enter/Space
+  - ARIA tablist pattern: `role="tablist"`, `role="tab"`, `aria-selected`, `aria-controls`, `hidden` on inactive panels
+  - Anti-flicker 80ms hover delay via `setTimeout`/`clearTimeout`
+  - Shared data source (`experienceData.js`) used by both ExperienceStrips and TelerikTimeline
+  - Build-time switch (`USE_STRIP_TIMELINE`) to toggle between implementations
+
+### Technical Details
+- **Single data source**: `experienceData.js` exports 5 entries with `id`, `date`, `yearLabel`, `title`, `company`, `description`, `icon`, `color`, `category`, `badge`, `skills[]`
+- **Flex-grow animation**: Inactive strips `flex-grow: 1`, active `flex-grow: 5` with smooth cubic-bezier transition
+- **Content reveal**: `.strip-content` uses `opacity` + `visibility` + `transform` transitions with staggered delay
+- **CSS custom properties**: `--strip-color` set via inline style, consumed by `background`, `color`, badges, icons
+- **Reduced motion**: `@media (prefers-reduced-motion: reduce)` disables all transitions/animations
+- **Vite build**: UMD bundle (`timeline.umd.js`) + CSS (`timeline.css`) copied to root for vanilla JS integration
+
+### Documentation
+- Added `docs/experience-strips-m1.md` with implementation details, customization guide, and testing checklist
+
 ## [1.6.0] - 2025-11-07
 
 ### Added
