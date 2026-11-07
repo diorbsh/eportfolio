@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2025-11-07
+
+### Added
+- **Profile Photo as Favicon & Navigation Logo** — Replaces "DB" monogram and emoji favicon:
+  - Face-centered crop from hero profile photo (shifted up 30% for optimal face visibility at 16px)
+  - Complete favicon set: favicon.ico (32×32), favicon-16×16.png, favicon-32×32.png, apple-touch-icon.png (180×180), icon-192.png, icon-512.png
+  - Navigation logo: 96×96px Retina-ready image displayed at 36×36px with CSS `border-radius: 50%`, `object-fit: cover`, subtle theme-aware border
+  - Cache-busting query parameter (`?v=2`) on all icon links to bypass aggressive browser favicon caching
+  - Full theme support: border colors use CSS custom properties (`--color-border`, `--color-primary`) for automatic light/dark adaptation
+  - Accessibility: proper `alt` text, `aria-label` on link, fixed dimensions prevent layout shift
+
+### Technical Details
+- **Asset generation**: Sharp (Node.js) script crops 406×416 source to 406×406 square centered on face, then resizes to all required dimensions
+- **Crop positioning**: `top = (height - size) * 0.3` shifts crop upward to center face in portrait-oriented photo
+- **Navigation logo**: CSS-only rounding via `border-radius: 50%` (no mask images needed), `flex-shrink: 0` prevents distortion
+- **Theme integration**: Border uses `var(--color-border)` (default) and `var(--color-primary)` (hover) — updates live with theme toggle
+- **Zero layout shift**: `width="36" height="36"` on `<img>` + fixed CSS dimensions
+
+### Documentation
+- Added `docs/favicon-and-logo.md` with implementation details, regeneration guide, and testing checklist
+
 ## [1.4.0] - 2025-11-07
 
 ### Added

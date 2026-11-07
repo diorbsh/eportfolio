@@ -286,10 +286,18 @@ input, textarea {
     color: var(--color-text);
 }
 
-.logo-mark {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-primary);
+.logo-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-border);
+    flex-shrink: 0;
+    transition: border-color var(--transition-fast);
+}
+
+.nav-logo:hover .logo-image {
+    border-color: var(--color-primary);
 }
 
 .logo-text {
