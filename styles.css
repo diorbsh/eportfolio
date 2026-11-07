@@ -1585,9 +1585,13 @@ input, textarea {
 
 /* Submit button loading state */
 #submitBtn .btn-loading {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: var(--space-sm);
+}
+
+#submitBtn .btn-loading:not([hidden]) {
+    display: inline-flex;
 }
 
 #submitBtn .btn-loading i {

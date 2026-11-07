@@ -860,7 +860,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
 
         const RECEIVER_EMAIL = 'diorbushati@gmail.com';
         const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECEIVER_EMAIL}`;
-        const SUBMIT_TIMEOUT = 10000; // 10 seconds timeout
+        const SUBMIT_TIMEOUT = 15000; // 15 seconds timeout
 
         // Form elements
         const formContent = form.querySelector('.form-content');
