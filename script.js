@@ -651,21 +651,213 @@
 
         const RECEIVER_EMAIL = 'diorbushati@gmail.com';
         const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECEIVER_EMAIL}`;
+        const SUBMIT_TIMEOUT = 15000; // 15 seconds timeout
 
-        form.addEventListener('submit', async (e) => {
+        // Form elements
+        const formContent = form.querySelector('.form-content');
+        const submitBtn = form.querySelector('#submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        const formStatus = form.querySelector('#formStatus');
+        const formSuccess = form.querySelector('.form-success');
+        const formErrorState = form.querySelector('.form-error-state');
+        const resetFormBtn = form.querySelector('#resetFormBtn');
+        const retryBtn = form.querySelector('#retryBtn');
+        const successContactValue = form.querySelector('.success-contact-value');
+
+        // Field elements
+        const nameInput = form.querySelector('#name');
+        const emailInput = form.querySelector('#email');
+        const messageInput = form.querySelector('#message');
+        const inputs = [nameInput, emailInput, messageInput];
+
+        // State
+        let isSubmitting = false;
+        let submitTimeoutId = null;
+        let animationFrameId = null;
+
+        // Validation helpers
+        function validateEmail(value) {
+            // Accept email or phone (simple check for @ or digits)
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
+            return emailRegex.test(value.trim()) || phoneRegex.test(value.trim());
+        }
+
+        function validateField(input) {
+            const value = input.value.trim();
+            const errorEl = input.parentElement.querySelector('.form-error');
+            let isValid = true;
+            let errorMessage = '';
+
+            if (!value) {
+                isValid = false;
+                errorMessage = 'Dieses Feld ist erforderlich.';
+            } else if (input.id === 'email' && !validateEmail(value)) {
+                isValid = false;
+                errorMessage = 'Bitte gib eine gültige E-Mail-Adresse oder Telefonnummer ein.';
+            }
+
+            if (!isValid) {
+                input.parentElement.classList.add('has-error');
+                if (errorEl) {
+                    errorEl.textContent = errorMessage;
+                    errorEl.classList.add('visible');
+                }
+            } else {
+                input.parentElement.classList.remove('has-error');
+                if (errorEl) {
+                    errorEl.classList.remove('visible');
+                    errorEl.textContent = '';
+                }
+            }
+
+            return isValid;
+        }
+
+        function clearAllErrors() {
+            inputs.forEach(input => {
+                input.parentElement.classList.remove('has-error');
+                const errorEl = input.parentElement.querySelector('.form-error');
+                if (errorEl) {
+                    errorEl.classList.remove('visible');
+                    errorEl.textContent = '';
+                }
+            });
+            hideFormStatus();
+        }
+
+        function showFormStatus(message, type) {
+            formStatus.textContent = message;
+            formStatus.className = 'form-status visible ' + type;
+        }
+
+        function hideFormStatus() {
+            formStatus.classList.remove('visible', 'success', 'error');
+            formStatus.textContent = '';
+        }
+
+        // Success view
+        function showSuccess(contactValue) {
+            form.classList.remove('submitting');
+            formContent.hidden = true;
+            formContent.setAttribute('aria-hidden', 'true');
+
+            successContactValue.textContent = contactValue;
+            formSuccess.hidden = false;
+            formSuccess.setAttribute('aria-hidden', 'false');
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                formSuccess.classList.add('visible');
+            });
+
+            // Focus management for accessibility
+            const successTitle = formSuccess.querySelector('.success-title');
+            if (successTitle) {
+                successTitle.setAttribute('tabindex', '-1');
+                successTitle.focus({ preventScroll: true });
+            }
+        }
+
+        function hideSuccess() {
+            formSuccess.classList.remove('visible');
+            formSuccess.addEventListener('transitionend', function handler() {
+                formSuccess.hidden = true;
+                formSuccess.setAttribute('aria-hidden', 'true');
+                formSuccess.removeEventListener('transitionend', handler);
+            }, { once: true });
+        }
+
+        // Error state
+        function showErrorState() {
+            form.classList.remove('submitting');
+            formContent.hidden = true;
+            formContent.setAttribute('aria-hidden', 'true');
+
+            formErrorState.hidden = false;
+            formErrorState.setAttribute('aria-hidden', 'false');
+
+            requestAnimationFrame(() => {
+                formErrorState.classList.add('visible');
+            });
+
+            // Focus management for accessibility
+            const errorText = formErrorState.querySelector('.error-text');
+            if (errorText) {
+                errorText.setAttribute('tabindex', '-1');
+                errorText.focus({ preventScroll: true });
+            }
+        }
+
+        function hideErrorState() {
+            formErrorState.classList.remove('visible');
+            formErrorState.addEventListener('transitionend', function handler() {
+                formErrorState.hidden = true;
+                formErrorState.setAttribute('aria-hidden', 'true');
+                formErrorState.removeEventListener('transitionend', handler);
+            }, { once: true });
+        }
+
+        // Reset form to initial state
+        function resetForm() {
+            hideSuccess();
+            hideErrorState();
+            hideFormStatus();
+            clearAllErrors();
+
+            form.reset();
+
+            formContent.hidden = false;
+            formContent.setAttribute('aria-hidden', 'false');
+            form.classList.remove('submitting');
+
+            requestAnimationFrame(() => {
+                formContent.style.opacity = '';
+                formContent.style.transform = '';
+            });
+
+            // Focus first field
+            nameInput.focus({ preventScroll: true });
+        }
+
+        // Submit handler
+        async function handleSubmit(e) {
             e.preventDefault();
 
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.querySelector('.btn-text').textContent;
-            const btnLoading = submitBtn.querySelector('.btn-loading');
+            if (isSubmitting) return;
 
+            // Validate all fields
+            clearAllErrors();
+            let allValid = true;
+            inputs.forEach(input => {
+                if (!validateField(input)) allValid = false;
+            });
+
+            if (!allValid) {
+                // Focus first invalid field
+                const firstInvalid = form.querySelector('.has-error input, .has-error textarea');
+                if (firstInvalid) firstInvalid.focus({ preventScroll: true });
+                return;
+            }
+
+            isSubmitting = true;
+            form.classList.add('submitting');
+
+            // Show loading state
+            btnText.hidden = true;
+            btnLoading.hidden = false;
+            submitBtn.disabled = true;
+
+            // Get form data
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             data._subject = `Neue Portfolio-Anfrage von ${data.name}`;
+            const contactValue = data.email; // Store for success view
 
-            submitBtn.disabled = true;
-            submitBtn.querySelector('.btn-text').hidden = true;
-            btnLoading.hidden = false;
+            // Set timeout for fetch
+            const controller = new AbortController();
+            submitTimeoutId = setTimeout(() => controller.abort(), SUBMIT_TIMEOUT);
 
             try {
                 const response = await fetch(FORMSUBMIT_ENDPOINT, {
@@ -675,50 +867,90 @@
                         Accept: 'application/json',
                     },
                     body: JSON.stringify(data),
+                    signal: controller.signal,
                 });
 
+                clearTimeout(submitTimeoutId);
+                submitTimeoutId = null;
+
                 if (!response.ok) {
-                    throw new Error('Request failed');
+                    throw new Error(`Server responded with ${response.status}`);
                 }
 
-                submitBtn.disabled = false;
-                submitBtn.querySelector('.btn-text').hidden = false;
-                submitBtn.querySelector('.btn-text').textContent = 'Gesendet! ✓';
-                btnLoading.hidden = true;
-                submitBtn.style.background = 'var(--color-success)';
+                // Success - show success view
+                showSuccess(contactValue);
 
-                form.reset();
-
-                setTimeout(() => {
-                    submitBtn.querySelector('.btn-text').textContent = originalText;
-                    submitBtn.style.background = '';
-                }, 3000);
             } catch (error) {
-                console.error('FAILED...', error);
-                submitBtn.disabled = false;
-                submitBtn.querySelector('.btn-text').hidden = false;
-                btnLoading.hidden = true;
-                submitBtn.querySelector('.btn-text').textContent = 'Fehler – erneut versuchen';
-                submitBtn.style.background = 'var(--color-error)';
+                clearTimeout(submitTimeoutId);
+                submitTimeoutId = null;
 
-                setTimeout(() => {
-                    submitBtn.querySelector('.btn-text').textContent = originalText;
-                    submitBtn.style.background = '';
-                }, 3000);
+                // Don't show error if aborted (shouldn't happen with our timeout)
+                if (error.name === 'AbortError') {
+                    showErrorState();
+                } else {
+                    console.error('Form submission failed:', error);
+                    showErrorState();
+                }
             }
+        }
+
+        // Event listeners
+        form.addEventListener('submit', handleSubmit);
+
+        // Real-time validation on blur
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => {
+                if (input.parentElement.classList.contains('has-error')) {
+                    validateField(input);
+                }
+            });
         });
 
-        const inputs = form.querySelectorAll('input, textarea');
+        // Focus styles
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
                 input.parentElement.classList.add('focused');
             });
             input.addEventListener('blur', () => {
                 input.parentElement.classList.remove('focused');
-                if (input.value) input.parentElement.classList.add('filled');
-                else input.parentElement.classList.remove('filled');
             });
         });
+
+        // Reset form button
+        resetFormBtn.addEventListener('click', resetForm);
+
+        // Retry button
+        retryBtn.addEventListener('click', () => {
+            hideErrorState();
+            formContent.hidden = false;
+            formContent.setAttribute('aria-hidden', 'false');
+            requestAnimationFrame(() => {
+                formContent.style.opacity = '';
+                formContent.style.transform = '';
+            });
+            nameInput.focus({ preventScroll: true });
+        });
+
+        // Cleanup function
+        function cleanup() {
+            if (submitTimeoutId) clearTimeout(submitTimeoutId);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            form.removeEventListener('submit', handleSubmit);
+            inputs.forEach(input => {
+                input.removeEventListener('blur', validateField);
+                input.removeEventListener('focus', () => {});
+            });
+            resetFormBtn.removeEventListener('click', resetForm);
+            retryBtn.removeEventListener('click', resetForm);
+        }
+
+        // Store cleanup
+        form._contactFormCleanup = cleanup;
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', cleanup, { once: true });
     }
 
     function initParallaxEffects() {

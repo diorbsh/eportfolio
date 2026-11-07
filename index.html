@@ -320,27 +320,52 @@
                         </div>
                     </div>
 
-                    <form class="contact-form" id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Dein Name</label>
-                            <input type="text" id="name" name="name" required placeholder="Wie heißt du?">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">E-Mail / Telefon</label>
-                            <input type="text" id="email" name="email" required placeholder="Wie kann ich dich erreichen?">
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Nachricht</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="Schick mir deine Anfragen oder Fragen"></textarea>
+                    <form class="contact-form" id="contactForm" novalidate>
+                        <div class="form-content">
+                            <div class="form-group">
+                                <label for="name">Dein Name</label>
+                                <input type="text" id="name" name="name" required placeholder="Wie heißt du?" autocomplete="name">
+                                <span class="form-error" aria-live="polite"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-Mail / Telefon</label>
+                                <input type="text" id="email" name="email" required placeholder="Wie kann ich dich erreichen?" autocomplete="email">
+                                <span class="form-error" aria-live="polite"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Nachricht</label>
+                                <textarea id="message" name="message" rows="5" required placeholder="Schick mir deine Anfragen oder Fragen"></textarea>
+                                <span class="form-error" aria-live="polite"></span>
+                            </div>
+
+                            <div id="formStatus" class="form-status" aria-live="polite" role="status"></div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                                    <span class="btn-text">Senden</span>
+                                    <span class="btn-loading" hidden><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Wird gesendet&hellip;</span>
+                                </button>
+                            </div>
+                            <p class="form-note">Ich melde mich bald bei dir zurück.</p>
                         </div>
 
-                        <div id="formStatus" class="form-status" aria-live="polite"></div>
+                        <div class="form-success" hidden aria-hidden="true">
+                            <div class="success-icon" aria-hidden="true">
+                                <svg class="checkmark-svg" viewBox="0 0 52 52" width="72" height="72">
+                                    <circle class="checkmark-circle" cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                                    <path class="checkmark-check" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/>
+                                </svg>
+                            </div>
+                            <h3 class="success-title">Nachricht gesendet</h3>
+                            <p class="success-text">Danke für deine Nachricht. Ich melde mich bald bei dir zurück.</p>
+                            <p class="success-contact" aria-live="polite"><span class="success-contact-label">Antwort an:</span> <span class="success-contact-value"></span></p>
+                            <button type="button" class="btn btn-secondary btn-full" id="resetFormBtn">Neue Nachricht schreiben</button>
+                        </div>
 
-                        <button type="submit" class="btn btn-primary btn-full">
-                            <span class="btn-text">Senden</span>
-                            <span class="btn-loading" hidden><i class="fas fa-spinner fa-spin"></i> Wird gesendet...</span>
-                        </button>
-                        <p class="form-note">Ich melde mich bald bei dir zurück.</p>
+                        <div class="form-error-state" hidden aria-hidden="true" role="alert">
+                            <p class="error-text">Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut oder schreibe mir direkt per E-Mail.</p>
+                            <button type="button" class="btn btn-primary btn-full" id="retryBtn">Erneut versuchen</button>
+                        </div>
                     </form>
                 </div>
             </div>
