@@ -1472,6 +1472,23 @@ input, textarea {
     margin-left: 2px;
 }
 
+/* Turnstile widget (Variante B) */
+.turnstile-widget {
+    display: flex;
+    justify-content: center;
+    margin: var(--space-md) 0;
+}
+
+.turnstile-widget[hidden] {
+    display: none;
+}
+
+/* Ensure Turnstile iframe is centered and responsive */
+.turnstile-widget > div,
+.turnstile-widget iframe {
+    max-width: 100%;
+}
+
 /* Contact Form Styles */
 .contact-form {
     background: var(--color-card);
