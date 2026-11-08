@@ -322,32 +322,37 @@
                         </div>
                     </div>
 
-                    <form class="contact-form" id="contactForm" novalidate>
+                    <form class="contact-form" id="contactForm" novalidate
+      action="https://formsubmit.co/diorbushati@gmail.com"
+      method="POST">
                         <!-- Honeypot field for spam protection (hidden via CSS, not display:none) -->
                         <div class="form-honeypot" aria-hidden="true">
                             <label for="website">Website</label>
                             <input type="text" id="website" name="_honey" tabindex="-1" autocomplete="off">
                         </div>
 
+                        <!-- FormSubmit configuration (used by fallback submit) -->
+                        <input type="hidden" name="_subject" value="Neue Nachricht über das Portfolio">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_next" value="#kontakt-danke">
+
                         <div class="form-content">
                             <div class="form-group">
                                 <label for="name">Ihr Name <span class="required" aria-hidden="true">*</span></label>
-                                <input type="text" id="name" name="name" required placeholder="Wie heißen Sie?" autocomplete="name" aria-describedby="name-error" maxlength="80" data-max-length="80">
+                                <input type="text" id="name" name="name" required placeholder="Wie heißen Sie?" autocomplete="name" aria-describedby="name-error" maxlength="80">
                                 <span id="name-error" class="form-error" aria-live="polite"></span>
                             </div>
                             <div class="form-group">
                                 <label for="email">E-Mail / Telefon <span class="required" aria-hidden="true">*</span></label>
-                                <input type="text" id="email" name="email" required placeholder="Wie kann ich Sie erreichen?" autocomplete="email" aria-describedby="email-error" maxlength="120" data-max-length="120">
+                                <input type="text" id="email" name="email" required placeholder="Wie kann ich Sie erreichen?" autocomplete="email" aria-describedby="email-error" maxlength="120">
                                 <span id="email-error" class="form-error" aria-live="polite"></span>
                             </div>
                             <div class="form-group">
                                 <label for="message">Nachricht <span class="required" aria-hidden="true">*</span></label>
-                                <textarea id="message" name="message" rows="5" required placeholder="Schicken Sie mir Ihre Anfragen oder Fragen" aria-describedby="message-error" maxlength="5000" data-max-length="5000"></textarea>
+                                <textarea id="message" name="message" rows="5" required placeholder="Schicken Sie mir Ihre Anfragen oder Fragen" aria-describedby="message-error" maxlength="5000"></textarea>
                                 <span id="message-error" class="form-error" aria-live="polite"></span>
                             </div>
-
-                            <!-- Cloudflare Turnstile widget (Variante B) - load only if site key is configured -->
-                            <div id="turnstile-widget" class="turnstile-widget" hidden aria-hidden="true"></div>
 
                             <div id="formStatus" class="form-status" aria-live="polite" role="status" hidden></div>
 
@@ -357,7 +362,6 @@
                                     <span class="btn-loading" hidden><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Wird gesendet&hellip;</span>
                                 </button>
                             </div>
-                            <p class="form-note" hidden>Ich melde mich bald bei Ihnen zurück.</p>
                         </div>
 
                         <div class="form-success" hidden aria-hidden="true">
@@ -374,7 +378,7 @@
                         </div>
 
                         <div class="form-error-state" hidden aria-hidden="true" role="alert">
-                            <p class="error-text">Etwas ist schiefgelaufen. Bitte versuchen Sie es später noch einmal oder schreiben Sie mir direkt an diorbushati@gmail.com.</p>
+                            <p class="error-text">Das Senden hat leider nicht geklappt. Bitte schreiben Sie mir direkt an diorbushati@gmail.com.</p>
                             <button type="button" class="btn btn-primary btn-full" id="retryBtn">Erneut versuchen</button>
                         </div>
                     </form>

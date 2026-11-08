@@ -1,130 +1,131 @@
 # Contact Form Setup Guide
 
-This document explains how to configure and test the contact form with FormSubmit and spam protection.
+This document explains how to configure and test the contact form with FormSubmit.
 
 ## Overview
 
-The contact form supports two spam protection variants:
+The contact form uses **FormSubmit.co** with a simplified, robust implementation:
 
-| Feature | Variante A (FormSubmit Captcha) | Variante B (Cloudflare Turnstile) |
-|---------|--------------------------------|-----------------------------------|
-| **Complexity** | Simple (no backend) | Requires serverless function |
-| **Spam Protection** | Basic (FormSubmit's built-in) | Strong (invisible CAPTCHA) |
-| **User Experience** | May show captcha challenge | Invisible/non-interactive |
-| **Privacy** | Good | Excellent (GDPR-friendly) |
-| **Cost** | Free | Free (Cloudflare Turnstile) |
+- **Primary**: AJAX fetch to `https://formsubmit.co/ajax/email` (no page reload)
+- **Fallback**: Normal form submit (page navigates to FormSubmit, then redirects back via `_next`)
+- **Spam Protection**: Single honeypot field (CSS-hidden, catches most bots)
+- **No Turnstile, no time checks, no rate limits, no link heuristics**
 
 ---
 
-## Current Implementation (Ready to Use)
+## Current Implementation
 
-The form is already configured with **baseline spam protection** (always active):
+The form has **baseline spam protection** (always active):
 
-1. **Honeypot field** (`_honey` / `website`) - hidden via CSS (position: absolute; left: -9999px)
-2. **Time check** - rejects submissions faster than 3 seconds
-3. **Input sanitization** - trims, normalizes whitespace
-4. **Max lengths** - Name: 80, Email: 120, Message: 5000 chars
-5. **Link spam heuristic** - rejects > 2 URLs in message
-6. **Client-side rate limit** - 45 second cooldown after successful submit
+1. **Honeypot field** (`_honey` / `website`) - hidden via CSS (`position: absolute; left: -9999px`)
+2. **Input sanitization** - trims, normalizes whitespace
+3. **Max lengths** - Name: 80, Email: 120, Message: 5000 chars
+4. **Email/phone validation** - accepts valid email or phone number format
 
 ---
 
-## Variante A: FormSubmit Captcha (Simplest)
+## FormSubmit Configuration
 
-### Enable
-In `script.js`, change:
-```javascript
-const FORMSUBMIT_PARAMS = {
-    _subject: 'Neue Nachricht über das Portfolio',
-    _template: 'table',
-    _captcha: 'true'  // Change from 'false' to 'true'
-};
-```
+### First Submission (Important!)
 
-### How it works
-- FormSubmit adds `_captcha=true` to form data
-- On suspicious submissions, FormSubmit shows a captcha challenge page
-- User solves captcha → form submits → returns to your site
-- **With AJAX**: FormSubmit returns JSON, but captcha flow may redirect
+On the **very first** form submission to a new email/alias:
 
-### Caveat with AJAX
-FormSubmit's captcha is designed for traditional form POST. With AJAX:
-- If captcha triggered, FormSubmit returns HTML challenge page (not JSON)
-- The `Accept: application/json` header may prevent captcha display
-- **Recommendation**: Use Variante B for AJAX, or submit to FormSubmit directly (no AJAX)
+1. FormSubmit sends a **confirmation email** to `diorbushati@gmail.com`
+2. You **must click the confirmation link** in that email
+3. Only after confirmation will subsequent submissions be delivered
+4. Check **Spam folder** if you don't see it
 
----
-
-## Variante B: Cloudflare Turnstile (Recommended)
-
-### Setup Steps
-
-#### 1. Create Turnstile Site
-1. Go to [Cloudflare Dashboard → Turnstile](https://dash.cloudflare.com/ → Turnstile)
-2. Click "Add Site"
-3. **Site name**: Your portfolio domain (e.g., `diorbsh.github.io`)
-4. **Domain**: Add your production domain AND `localhost`
-   - Example: `diorbsh.github.io`, `localhost`
-5. **Widget Mode**: Choose "Managed" (auto) or "Non-interactive" (invisible)
-6. Click "Create"
-7. Copy **Site Key** (public) and **Secret Key** (private)
-
-#### 2. Configure Frontend
-Add Site Key to HTML meta tag (in `index.html`):
-```html
-<meta name="turnstile-site-key" content="YOUR_SITE_KEY_HERE">
-```
-Or set via environment variable at build time.
-
-The Turnstile script is already loaded async in `index.html`:
-```html
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-```
-
-#### 3. Deploy Serverless Function
-The function at `functions/api/contact.js` handles:
-- Turnstile token verification (server-side)
-- Input validation & sanitization
-- Forwarding to FormSubmit OR sending via Resend/Brevo
-
-**Deploy to Cloudflare Pages:**
-1. Push to GitHub
-2. Connect repo in Cloudflare Pages
-3. Build settings: Framework = "None", Build command = (empty), Output = (empty)
-4. Add Environment Variables in Pages dashboard:
-   - `TURNSTILE_SECRET_KEY` = your secret key
-   - `FORMSUBMIT_EMAIL` = `diorbushati@gmail.com`
-   - Optional: `FORMSUBMIT_ALIAS_ID` = your FormSubmit alias
-   - Optional: `RESEND_API_KEY` or `BREVO_API_KEY` for direct email
-
-**Deploy to Netlify:**
-- Place function in `netlify/functions/contact.js`
-- Add env vars in Netlify dashboard
-
-**Deploy to Vercel:**
-- Place function in `api/contact.js`
-- Add env vars in Vercel dashboard
-
-#### 4. Update Frontend Endpoint
-In `script.js`, change the endpoint:
-```javascript
-const FORMSUBMIT_ENDPOINT = '/api/contact'; // Your serverless function
-```
-
----
-
-## Using FormSubmit Alias ID (Privacy)
+### Using FormSubmit Alias ID (Privacy)
 
 Instead of exposing your email in frontend code:
 
 1. Register at [formsubmit.co](https://formsubmit.co) with your email
 2. Verify email via confirmation link
 3. Get your **Alias ID** (e.g., `abc123xyz`)
-3. In frontend, use alias:
+4. In `script.js`, update the endpoint:
    ```javascript
-   const FORMSUBMIT_ENDPOINT = 'https://formsubmit.co/ajax/abc123xyz';
+   const FORMSUBMIT_AJAX_ENDPOINT = 'https://formsubmit.co/ajax/abc123xyz';
    ```
-4. Or in serverless function, set `FORMSUBMIT_ALIAS_ID` env var
+5. In `index.html`, update the form action:
+   ```html
+   <form action="https://formsubmit.co/abc123xyz" method="POST">
+   ```
+
+---
+
+## HTML Form Structure (index.html)
+
+The form includes these hidden fields for the fallback flow:
+
+```html
+<form id="contactForm" class="contact-form" action="https://formsubmit.co/diorbushati@gmail.com" method="POST" novalidate>
+    <!-- Honeypot (hidden via CSS) -->
+    <input type="text" name="_honey" id="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+    <!-- Fallback fields (used when JS fetch fails) -->
+    <input type="hidden" name="_subject" value="Neue Nachricht über das Portfolio" />
+    <input type="hidden" name="_template" value="table" />
+    <input type="hidden" name="_captcha" value="false" />
+    <input type="hidden" name="_next" value="#kontakt-danke" />
+    <!-- _replyto is added dynamically by JS when email is valid -->
+
+    <!-- Visible fields: name, email, message -->
+    ...
+</form>
+```
+
+### Fallback Fields Explained
+
+| Field | Purpose |
+|-------|---------|
+| `_subject` | Email subject line |
+| `_template` | Email format: `table` (structured) or `box` (card) |
+| `_captcha` | FormSubmit's built-in captcha (keep `false`) |
+| `_next` | Redirect after fallback submit (uses `#kontakt-danke` anchor) |
+| `_replyto` | Sets Reply-To header (added dynamically by JS) |
+
+---
+
+## JavaScript Implementation (script.js)
+
+### Key Functions
+
+| Function | Purpose |
+|----------|---------|
+| `initContactForm()` | Main initialization |
+| `handleSubmit(e)` | AJAX submit with timeout, triggers fallback on failure |
+| `triggerFallbackSubmit()` | Removes JS handler, calls `form.submit()` |
+| `showSuccess(contactValue)` | Displays success view with contact info |
+| `showErrorState(message)` | Displays error view with retry button |
+| `resetForm()` | Resets form to initial state |
+| `validateField(input)` | Validates single field on blur/input |
+
+### Flow
+
+```
+User submits form
+    ↓
+Honeypot check (if filled → fake success, no email sent)
+    ↓
+Client-side validation (required fields, email/phone format)
+    ↓
+AJAX fetch to FormSubmit (10s timeout)
+    ↓
+Success? → showSuccess()
+    ↓
+Fail/Timeout/CORS/Adblock? → triggerFallbackSubmit()
+    ↓
+Normal form POST → FormSubmit → redirect to #kontakt-danke
+```
+
+### Success Detection
+
+FormSubmit returns JSON with **string** success value:
+```javascript
+// WRONG: result.success === false
+// RIGHT:
+const isSuccess = result.success === 'true' || result.success === true;
+```
 
 ---
 
@@ -132,11 +133,10 @@ Instead of exposing your email in frontend code:
 
 ### Normal Submission
 1. Fill all fields correctly
-2. Wait > 3 seconds after page load
-3. Submit
-4. ✅ Success view shows "Vielen Dank, ich melde mich in Kürze bei Ihnen."
-5. ✅ Email received at `diorbushati@gmail.com`
-6. ✅ Form resets on "Neue Nachricht schreiben"
+2. Submit
+3. ✅ Success view shows "Vielen Dank, ich melde mich in Kürze bei Ihnen."
+4. ✅ Email received at `diorbushati@gmail.com`
+5. ✅ Form resets on "Neue Nachricht schreiben"
 
 ### Honeypot Test (Bot Simulation)
 1. Open DevTools → Console
@@ -145,46 +145,22 @@ Instead of exposing your email in frontend code:
 4. ✅ Shows success view (fake) but **no email sent**
 5. ✅ Console logs "Honeypot triggered, silently ignoring submission"
 
-### Too Fast Submission
-1. Reload page
-2. Immediately fill and submit (< 3 seconds)
-3. ✅ Error: "Bitte nehmen Sie sich einen Moment Zeit für Ihre Nachricht."
-
-### Link Spam Test
-1. Fill form with message containing 3+ URLs
-2. Submit
-3. ✅ Error: "Zu viele Links in der Nachricht (maximal 2 erlaubt)."
-
-### Rate Limit Test
-1. Submit successfully
-2. Try to submit again within 45 seconds
-3. ✅ Error: "Bitte warten Sie X Sekunden, bevor Sie eine weitere Nachricht senden."
-
-### Turnstile Test (Variante B)
-1. Without Turnstile token (block script or clear token)
-2. Submit
-3. ✅ Error: "Die Sicherheitsprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut."
-
 ### Validation Tests
+
 | Field | Invalid Input | Expected Error |
 |-------|---------------|----------------|
 | Name | Empty | "Dieses Feld ist erforderlich." |
-| Name | 81 chars | "Maximal 80 Zeichen erlaubt." |
+| Name | 81 chars | "Maximal 80 Zeichen erlaubt." (via HTML maxlength) |
 | Email | Empty | "Dieses Feld ist erforderlich." |
 | Email | "invalid" | "Bitte geben Sie eine gültige E-Mail-Adresse oder Telefonnummer ein." |
 | Message | Empty | "Dieses Feld ist erforderlich." |
-| Message | 9 chars | "Nachricht muss mindestens 10 Zeichen lang sein." |
-| Message | 5001 chars | "Nachricht ist zu lang (max. 5000 Zeichen)." |
+| Message | 5001 chars | "Maximal 5000 Zeichen erlaubt." (via HTML maxlength) |
 
----
-
-## First FormSubmit Submission
-
-**Important:** On the **very first** form submission to a new email/alias:
-1. FormSubmit sends a **confirmation email** to `diorbushati@gmail.com`
-2. You **must click the confirmation link** in that email
-3. Only after confirmation will subsequent submissions be delivered
-4. Check **Spam folder** if you don't see it
+### Fallback Test (Simulate Network Failure)
+1. Open DevTools → Network tab → Check "Offline"
+2. Fill and submit form
+3. ✅ Page navigates to FormSubmit, then redirects to `#kontakt-danke`
+4. ✅ Success view appears (or FormSubmit's thank you page)
 
 ---
 
@@ -192,42 +168,39 @@ Instead of exposing your email in frontend code:
 
 ### Emails not arriving
 - Check Spam/Junk folder
-- Verify FormSubmit confirmation email was clicked
+- Verify FormSubmit confirmation email was clicked (first submission only)
 - Check FormSubmit dashboard for delivery status
-- If using serverless function: check function logs
-
-### Turnstile not loading
-- Verify Site Key is correct in meta tag
-- Check browser console for errors
-- Ensure domain is added in Turnstile dashboard (including localhost)
 
 ### FormSubmit returns error
 - Check `_subject` and `_template` parameters
 - Verify email/alias is correct
 - Check FormSubmit rate limits (100/day free tier)
 
-### CORS errors (serverless function)
-- Function includes CORS headers
-- Ensure frontend calls correct endpoint (`/api/contact`)
+### Fallback not working
+- Verify form has `action="https://formsubmit.co/..."` and `method="POST"`
+- Verify `_next` points to `#kontakt-danke` (or full URL)
+- Check browser console for JS errors preventing `form.submit()`
+
+### CORS errors (AJAX)
+- The fallback handles this automatically
+- FormSubmit supports CORS for AJAX endpoint
 
 ---
 
-## Files Modified
+## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Form HTML, Turnstile widget container, meta tag for site key |
-| `styles.css` | Honeypot hiding, Turnstile widget styles |
-| `script.js` | Enhanced validation, spam protection, Turnstile integration, FormSubmit AJAX |
-| `functions/api/contact.js` | Serverless function for Turnstile verification (Variante B) |
-| `.env.example` | Environment variable template |
+| `index.html` | Form HTML with fallback fields, action/method for fallback |
+| `styles.css` | Honeypot hiding (`.form-success[hidden]`, `.form-error-state[hidden]`), form styling |
+| `script.js` | Simplified validation, AJAX with fallback, honeypot check |
+| `.env.example` | Environment variable template (for reference only) |
 
 ---
 
 ## Security Notes
 
 - **Never** commit `.env` or secret keys to git
-- Turnstile Secret Key **only** in serverless function environment
 - Honeypot field uses CSS hiding (not `display: none`) to catch bots
-- All validation runs both client AND server-side
-- Rate limiting is client-side only (supplement with server-side in production)
+- All validation runs client-side (FormSubmit also validates server-side)
+- No rate limiting client-side (FormSubmit has its own limits)

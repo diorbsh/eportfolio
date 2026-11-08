@@ -859,23 +859,8 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
         const form = document.getElementById('contactForm');
         if (!form) return;
 
-        // Configuration
-        const RECEIVER_EMAIL = 'diorbushati@gmail.com';
-        const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECEIVER_EMAIL}`;
-        const SUBMIT_TIMEOUT = 15000; // 15 seconds timeout
-        const MIN_SUBMIT_TIME_MS = 3000; // Minimum 3 seconds before submit
-        const MAX_LINKS_IN_MESSAGE = 2; // Max URLs allowed in message
-        const RATE_LIMIT_COOLDOWN_MS = 45000; // 45 seconds cooldown after success
-
-        // FormSubmit parameters
-        const FORMSUBMIT_PARAMS = {
-            _subject: 'Neue Nachricht über das Portfolio',
-            _template: 'table',
-            _captcha: 'false' // Set to 'true' to enable FormSubmit's built-in captcha (Variante A)
-        };
-
-        // Turnstile configuration (Variante B) - site key from meta tag or env
-        const TURNSTILE_SITE_KEY = document.querySelector('meta[name="turnstile-site-key"]')?.content || '';
+        const FORMSUBMIT_AJAX_ENDPOINT = 'https://formsubmit.co/ajax/diorbushati@gmail.com';
+        const SUBMIT_TIMEOUT = 10000; // 10 seconds timeout
 
         // Form elements
         const formContent = form.querySelector('.form-content');
@@ -889,7 +874,6 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
         const retryBtn = form.querySelector('#retryBtn');
         const successContactValue = form.querySelector('.success-contact-value');
         const honeypotInput = form.querySelector('#website'); // name="_honey"
-        const turnstileWidget = form.querySelector('#turnstile-widget');
 
         // Field elements
         const nameInput = form.querySelector('#name');
@@ -900,106 +884,26 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
         // State
         let isSubmitting = false;
         let submitTimeoutId = null;
-        let animationFrameId = null;
-        let formLoadTime = Date.now();
-        let lastSuccessfulSubmit = 0;
-        let turnstileWidgetId = null;
+        let fallbackTriggered = false;
 
-        // Initialize Turnstile if site key is available (Variante B)
-        function initTurnstile() {
-            if (!TURNSTILE_SITE_KEY || typeof window.turnstile === 'undefined') {
-                return false;
-            }
-
-            try {
-                turnstileWidget.hidden = false;
-                turnstileWidget.removeAttribute('aria-hidden');
-                turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
-                    sitekey: TURNSTILE_SITE_KEY,
-                    theme: 'auto',
-                    callback: () => {
-                        // Token received, enable submit if all else is valid
-                        updateSubmitButtonState();
-                    },
-                    'expired-callback': () => {
-                        // Token expired, reset
-                        updateSubmitButtonState();
-                    },
-                    'error-callback': () => {
-                        // Turnstile error
-                        updateSubmitButtonState();
-                    }
-                });
-                return true;
-            } catch (e) {
-                console.warn('Turnstile initialization failed:', e);
-                return false;
-            }
-        }
-
-        function resetTurnstile() {
-            if (turnstileWidgetId !== null && typeof window.turnstile !== 'undefined') {
-                try {
-                    window.turnstile.reset(turnstileWidgetId);
-                } catch (e) {
-                    // Ignore reset errors
-                }
-            }
-        }
-
-        function getTurnstileToken() {
-            if (turnstileWidgetId !== null && typeof window.turnstile !== 'undefined') {
-                try {
-                    return window.turnstile.getResponse(turnstileWidgetId);
-                } catch (e) {
-                    return '';
-                }
-            }
-            return '';
+        // Simple email validation
+        function isValidEmail(value) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
         }
 
         // Validation helpers
-        function validateEmail(value) {
-            // Accept email or phone (simple check for @ or digits)
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
-            return emailRegex.test(value.trim()) || phoneRegex.test(value.trim());
-        }
-
-        function countUrls(text) {
-            // Simple URL detection heuristic
-            const urlRegex = /(?:https?:\/\/|www\.)[^\s]+/gi;
-            const matches = text.match(urlRegex);
-            return matches ? matches.length : 0;
-        }
-
-        function sanitizeInput(value) {
-            // Trim and normalize whitespace
-            return value.trim().replace(/\s+/g, ' ');
-        }
-
         function validateField(input) {
-            const value = sanitizeInput(input.value);
+            const value = input.value.trim();
             const errorEl = input.parentElement.querySelector('.form-error');
             let isValid = true;
             let errorMessage = '';
 
-            // Check maxlength
-            const maxLength = parseInt(input.getAttribute('data-max-length') || input.getAttribute('maxlength') || '0', 10);
-            if (maxLength > 0 && value.length > maxLength) {
-                isValid = false;
-                errorMessage = `Maximal ${maxLength} Zeichen erlaubt.`;
-            }
-
             if (!value) {
                 isValid = false;
                 errorMessage = 'Dieses Feld ist erforderlich.';
-            } else if (input.id === 'email' && !validateEmail(value)) {
+            } else if (input.id === 'email' && !isValidEmail(value) && !/^[\d\s\-\+\(\)]{7,}$/.test(value)) {
                 isValid = false;
                 errorMessage = 'Bitte geben Sie eine gültige E-Mail-Adresse oder Telefonnummer ein.';
-            } else if (input.id === 'message' && countUrls(value) > MAX_LINKS_IN_MESSAGE) {
-                isValid = false;
-                errorMessage = `Zu viele Links in der Nachricht (maximal ${MAX_LINKS_IN_MESSAGE} erlaubt).`;
             }
 
             if (!isValid) {
@@ -1016,7 +920,6 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 }
             }
 
-            updateSubmitButtonState();
             return isValid;
         }
 
@@ -1036,7 +939,6 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             formStatus.textContent = message;
             formStatus.hidden = false;
             formStatus.className = 'form-status ' + type;
-            // Trigger animation via requestAnimationFrame
             requestAnimationFrame(() => {
                 formStatus.classList.add('visible');
             });
@@ -1044,45 +946,11 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
 
         function hideFormStatus() {
             formStatus.classList.remove('visible', 'success', 'error');
-            // Wait for transition to complete before hiding
             formStatus.addEventListener('transitionend', function handler() {
                 formStatus.hidden = true;
                 formStatus.textContent = '';
                 formStatus.removeEventListener('transitionend', handler);
             }, { once: true });
-        }
-
-        // Update submit button state based on validation, rate limit, Turnstile
-        function updateSubmitButtonState() {
-            if (isSubmitting) {
-                submitBtn.disabled = true;
-                return;
-            }
-
-            // Check rate limit
-            const timeSinceLastSubmit = Date.now() - lastSuccessfulSubmit;
-            if (timeSinceLastSubmit < RATE_LIMIT_COOLDOWN_MS) {
-                submitBtn.disabled = true;
-                return;
-            }
-
-            // Check if all required fields have values
-            const allFilled = inputs.every(input => sanitizeInput(input.value).length > 0);
-            if (!allFilled) {
-                submitBtn.disabled = true;
-                return;
-            }
-
-            // Check Turnstile if enabled
-            if (TURNSTILE_SITE_KEY && typeof window.turnstile !== 'undefined') {
-                const token = getTurnstileToken();
-                if (!token) {
-                    submitBtn.disabled = true;
-                    return;
-                }
-            }
-
-            submitBtn.disabled = false;
         }
 
         // Reset loading state - ALWAYS called via finally
@@ -1091,7 +959,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             form.classList.remove('submitting');
             btnText.hidden = false;
             btnLoading.hidden = true;
-            updateSubmitButtonState();
+            submitBtn.disabled = false;
         }
 
         // Success view
@@ -1104,20 +972,15 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             formSuccess.hidden = false;
             formSuccess.setAttribute('aria-hidden', 'false');
 
-            // Trigger animation
             requestAnimationFrame(() => {
                 formSuccess.classList.add('visible');
             });
 
-            // Focus management for accessibility
             const successTitle = formSuccess.querySelector('.success-title');
             if (successTitle) {
                 successTitle.setAttribute('tabindex', '-1');
                 successTitle.focus({ preventScroll: true });
             }
-
-            // Reset Turnstile token after success
-            resetTurnstile();
         }
 
         function hideSuccess() {
@@ -1147,14 +1010,10 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 formErrorState.classList.add('visible');
             });
 
-            // Focus management for accessibility
             if (errorText) {
                 errorText.setAttribute('tabindex', '-1');
                 errorText.focus({ preventScroll: true });
             }
-
-            // Reset Turnstile token after error
-            resetTurnstile();
         }
 
         function hideErrorState() {
@@ -1184,39 +1043,19 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 formContent.style.transform = '';
             });
 
-            // Reset Turnstile
-            resetTurnstile();
-
-            // Focus first field
             nameInput.focus({ preventScroll: true });
         }
 
-        // Submit handler
+        // Submit handler - primary: fetch AJAX, fallback: normal form submit
         async function handleSubmit(e) {
             e.preventDefault();
 
             if (isSubmitting) return;
 
-            // Rate limit check
-            const timeSinceLastSubmit = Date.now() - lastSuccessfulSubmit;
-            if (timeSinceLastSubmit < RATE_LIMIT_COOLDOWN_MS) {
-                const remainingSeconds = Math.ceil((RATE_LIMIT_COOLDOWN_MS - timeSinceLastSubmit) / 1000);
-                showFormStatus(`Bitte warten Sie ${remainingSeconds} Sekunden, bevor Sie eine weitere Nachricht senden.`, 'error');
-                return;
-            }
-
-            // Time check - reject submissions faster than MIN_SUBMIT_TIME_MS
-            const timeSinceLoad = Date.now() - formLoadTime;
-            if (timeSinceLoad < MIN_SUBMIT_TIME_MS) {
-                showFormStatus('Bitte nehmen Sie sich einen Moment Zeit für Ihre Nachricht.', 'error');
-                return;
-            }
-
             // Honeypot check - if filled, silently ignore (spam bot)
             if (honeypotInput && honeypotInput.value.trim() !== '') {
-                // Pretend success but don't actually send
                 console.log('Honeypot triggered, silently ignoring submission');
-                showSuccess(honeypotInput.value || '—');
+                showSuccess('—');
                 return;
             }
 
@@ -1228,26 +1067,13 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             });
 
             if (!allValid) {
-                // Focus first invalid field
                 const firstInvalid = form.querySelector('.has-error input, .has-error textarea');
                 if (firstInvalid) firstInvalid.focus({ preventScroll: true });
                 return;
             }
 
-            // Turnstile token check (Variante B)
-            let turnstileToken = '';
-            if (TURNSTILE_SITE_KEY && typeof window.turnstile !== 'undefined') {
-                turnstileToken = getTurnstileToken();
-                if (!turnstileToken) {
-                    showErrorState('Die Sicherheitsprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut.');
-                    return;
-                }
-            }
-
             isSubmitting = true;
             form.classList.add('submitting');
-
-            // Show loading state
             btnText.hidden = true;
             btnLoading.hidden = false;
             submitBtn.disabled = true;
@@ -1256,21 +1082,18 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            // Sanitize inputs
-            data.name = sanitizeInput(data.name);
-            data.email = sanitizeInput(data.email);
-            data.message = sanitizeInput(data.message);
+            data.name = data.name.trim();
+            data.email = data.email.trim();
+            data.message = data.message.trim();
 
-            // Remove honeypot from data sent to FormSubmit (it's named _honey)
-            delete data._honey;
-
-            // Add FormSubmit parameters
-            Object.assign(data, FORMSUBMIT_PARAMS);
-
-            // Add Turnstile token if available
-            if (turnstileToken) {
-                data['cf-turnstile-response'] = turnstileToken;
+            // Add _replyto if email is valid (FormSubmit uses this for Reply-To header)
+            const extraParams = {};
+            if (isValidEmail(data.email)) {
+                extraParams._replyto = data.email;
             }
+            extraParams._subject = 'Neue Nachricht über das Portfolio';
+            extraParams._template = 'table';
+            extraParams._captcha = 'false';
 
             const contactValue = data.email; // Store for success view
 
@@ -1279,15 +1102,18 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             submitTimeoutId = setTimeout(() => controller.abort(), SUBMIT_TIMEOUT);
 
             try {
-                const response = await fetch(FORMSUBMIT_ENDPOINT, {
+                const response = await fetch(FORMSUBMIT_AJAX_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        Accept: 'application/json',
+                        'Accept': 'application/json',
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify({ ...data, ...extraParams }),
                     signal: controller.signal,
                 });
+
+                clearTimeout(submitTimeoutId);
+                submitTimeoutId = null;
 
                 if (!response.ok) {
                     throw new Error(`Server responded with ${response.status}`);
@@ -1295,34 +1121,50 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
 
                 const result = await response.json();
 
-                // FormSubmit returns { success: true/false, message: "..." }
-                if (result.success === false) {
-                    throw new Error(result.message || 'FormSubmit returned error');
+                // FormSubmit returns success as STRING "true" or "false" (not boolean!)
+                const isSuccess = result.success === 'true' || result.success === true;
+
+                if (!isSuccess) {
+                    throw new Error(result.message || 'FormSubmit returned error: ' + JSON.stringify(result));
                 }
 
                 // Success - show success view
-                lastSuccessfulSubmit = Date.now();
                 showSuccess(contactValue);
 
             } catch (error) {
-                // Don't show error if aborted (timeout)
+                // Don't show error if aborted (timeout) - trigger fallback instead
                 if (error.name === 'AbortError') {
-                    showFormStatus('Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.', 'error');
-                } else {
-                    console.error('Form submission failed:', error);
-                    // Check if it's a Turnstile-related error
-                    if (TURNSTILE_SITE_KEY && error.message?.includes('turnstile')) {
-                        showErrorState('Die Sicherheitsprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut.');
-                    } else {
-                        showErrorState();
-                    }
+                    console.warn('Fetch timeout, triggering fallback submit...');
+                    triggerFallbackSubmit();
+                    return;
                 }
+
+                console.error('Form submission failed:', error);
+
+                // Trigger fallback submit for network/CORS/Adblocker errors
+                triggerFallbackSubmit();
             } finally {
-                // ALWAYS reset loading state - critical fix for stuck spinner
-                clearTimeout(submitTimeoutId);
-                submitTimeoutId = null;
-                resetLoadingState();
+                if (!fallbackTriggered) {
+                    resetLoadingState();
+                }
             }
+        }
+
+        // Fallback: normal form submit (page navigation to FormSubmit, then redirect to _next)
+        function triggerFallbackSubmit() {
+            if (fallbackTriggered) return;
+            fallbackTriggered = true;
+
+            // Remove the submit event listener to allow normal submission
+            form.removeEventListener('submit', handleSubmit);
+
+            // Show loading state
+            btnText.hidden = true;
+            btnLoading.hidden = false;
+            submitBtn.disabled = true;
+
+            // Submit the form normally (will navigate to FormSubmit, then redirect to #kontakt-danke)
+            form.submit();
         }
 
         // Event listeners
@@ -1335,7 +1177,6 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 if (input.parentElement.classList.contains('has-error')) {
                     validateField(input);
                 }
-                updateSubmitButtonState();
             });
         });
 
@@ -1364,29 +1205,9 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             nameInput.focus({ preventScroll: true });
         });
 
-        // Initialize Turnstile after DOM is ready
-        if (TURNSTILE_SITE_KEY) {
-            // Check if turnstile script is already loaded
-            if (typeof window.turnstile !== 'undefined') {
-                initTurnstile();
-            } else {
-                // Wait for turnstile script to load
-                const checkTurnstile = setInterval(() => {
-                    if (typeof window.turnstile !== 'undefined') {
-                        clearInterval(checkTurnstile);
-                        initTurnstile();
-                    }
-                }, 100);
-                // Timeout after 10 seconds
-                setTimeout(() => clearInterval(checkTurnstile), 10000);
-            }
-        }
-
         // Cleanup function
         function cleanup() {
             if (submitTimeoutId) clearTimeout(submitTimeoutId);
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-
             form.removeEventListener('submit', handleSubmit);
             inputs.forEach(input => {
                 input.removeEventListener('blur', validateField);
@@ -1396,10 +1217,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             retryBtn.removeEventListener('click', resetForm);
         }
 
-        // Store cleanup
         form._contactFormCleanup = cleanup;
-
-        // Cleanup on page unload
         window.addEventListener('beforeunload', cleanup, { once: true });
     }
 
