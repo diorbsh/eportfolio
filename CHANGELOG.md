@@ -89,11 +89,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Success state**: Form fades out (300ms), replaced by success view with:
     - SVG checkmark with stroke animation (circle draws in ~700ms, check draws in ~500ms with delay) in accent color
     - Headline "Nachricht gesendet"
-    - Text "Danke für deine Nachricht. Ich melde mich bald bei dir zurück."
+    - Text "Danke für Ihre Nachricht. Ich melde mich bald bei Ihnen zurück."
     - Subtle contact echo "Antwort an: [entered email/phone]"
     - "Neue Nachricht schreiben" button to reset form cleanly
   - **Error state**: Form stays with all data intact, shows inline error message above form:
-    - Message "Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut oder schreibe mir direkt per E-Mail."
+    - Message "Die Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie mir direkt per E-Mail."
     - "Erneut versuchen" button to return to form
     - No harsh red; uses theme-aware error color
   - Field-level validation with inline error messages (required fields, email/phone format)

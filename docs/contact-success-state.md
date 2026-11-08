@@ -14,7 +14,7 @@ The contact form now features a professional, accessible submission flow with th
     <!-- Initial form state -->
     <div class="form-content">
         <div class="form-group">
-            <label for="name">Dein Name</label>
+            <label for="name">Ihr Name</label>
             <input type="text" id="name" name="name" required autocomplete="name">
             <span class="form-error" aria-live="polite"></span>
         </div>
@@ -39,7 +39,7 @@ The contact form now features a professional, accessible submission flow with th
                 </span>
             </button>
         </div>
-        <p class="form-note">Ich melde mich bald bei dir zurück.</p>
+        <p class="form-note">Ich melde mich bald bei Ihnen zurück.</p>
     </div>
 
     <!-- Success state (hidden initially) -->
@@ -51,14 +51,14 @@ The contact form now features a professional, accessible submission flow with th
             </svg>
         </div>
         <h3 class="success-title">Nachricht gesendet</h3>
-        <p class="success-text">Danke für deine Nachricht. Ich melde mich bald bei dir zurück.</p>
+        <p class="success-text">Danke für Ihre Nachricht. Ich melde mich bald bei Ihnen zurück.</p>
         <p class="success-contact" aria-live="polite"><span class="success-contact-label">Antwort an:</span> <span class="success-contact-value"></span></p>
         <button type="button" class="btn btn-secondary btn-full" id="resetFormBtn">Neue Nachricht schreiben</button>
     </div>
 
     <!-- Error state (hidden initially) -->
     <div class="form-error-state" hidden aria-hidden="true" role="alert">
-        <p class="error-text">Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut oder schreibe mir direkt per E-Mail.</p>
+        <p class="error-text">Die Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie mir direkt per E-Mail.</p>
         <button type="button" class="btn btn-primary btn-full" id="retryBtn">Erneut versuchen</button>
     </div>
 </form>
@@ -86,13 +86,13 @@ The contact form now features a professional, accessible submission flow with th
   - Check: stroke-dashoffset 48 → 0 over 500ms cubic-bezier(0.4, 0, 0.2, 1) with 300ms delay
 - Content:
   - Title: "Nachricht gesendet"
-  - Text: "Danke für deine Nachricht. Ich melde mich bald bei dir zurück."
+  - Text: "Danke für Ihre Nachricht. Ich melde mich bald bei Ihnen zurück."
   - Contact echo: "Antwort an: [user's email/phone]"
   - Button: "Neue Nachricht schreiben" → resets to idle state
 
 ### 3. Error State
 - Form content fades out, error state fades in
-- Message: "Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut oder schreibe mir direkt per E-Mail."
+- Message: "Die Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie mir direkt per E-Mail."
 - Button: "Erneut versuchen" → returns to form with all data intact
 - No form reset on error
 

@@ -906,7 +906,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 errorMessage = 'Dieses Feld ist erforderlich.';
             } else if (input.id === 'email' && !validateEmail(value)) {
                 isValid = false;
-                errorMessage = 'Bitte gib eine gültige E-Mail-Adresse oder Telefonnummer ein.';
+                errorMessage = 'Bitte geben Sie eine gültige E-Mail-Adresse oder Telefonnummer ein.';
             }
 
             if (!isValid) {
@@ -1116,7 +1116,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             } catch (error) {
                 // Don't show error if aborted (timeout)
                 if (error.name === 'AbortError') {
-                    showFormStatus('Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.', 'error');
+                    showFormStatus('Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.', 'error');
                 } else {
                     console.error('Form submission failed:', error);
                     showErrorState();
