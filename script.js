@@ -143,12 +143,28 @@ const experienceData = [
         yearLabel: '2022–2023',
         title: 'Software Entwickler – Praktikum',
         company: 'Diepoldsau, Sankt Gallen, Schweiz',
-        description: 'App-Entwicklung, Technische Dokumentation, Cloud-Computing, IoT, MQTT, C++, Python, TortoiseSVN',
+        ort: 'Diepoldsau, Sankt Gallen, Schweiz',
+        beschreibung: 'Entwicklung einer mobilen App mit Xamarin und Cloud-Anbindung zur Visualisierung von Maschinendaten in Echtzeit. Kommunikation zwischen App und Maschine über MQTT und eine IoT-Infrastruktur.',
+        aufgaben: [
+            'Entwicklung der mobilen App mit Xamarin.Forms und C#',
+            'Anbindung an MQTT-Broker (Mosquitto) für Echtzeit-Datenaustausch',
+            'Implementierung von Cloud-Services zur Datenspeicherung und -verarbeitung',
+            'Erstellung technischer Dokumentation und API-Spezifikationen',
+            'Zusammenarbeit mit Embedded-Team für Maschinen-Integration'
+        ],
         icon: 'cogs',
         color: '#ff6b35',
         category: 'work',
         badge: { label: 'Praktikum', icon: 'cogs' },
-        skills: ['App-Entwicklung', 'Technische Dokumentation', 'Cloud-Computing', 'IoT', 'MQTT', 'C++', 'Python', 'TortoiseSVN']
+        skills: [
+            { name: 'Xamarin', info: 'Cross-Platform Mobile Development' },
+            { name: 'C#', info: 'Hauptprogrammiersprache für App-Logik' },
+            { name: 'MQTT', info: 'Leichtgewichtiges Messaging-Protokoll für IoT' },
+            { name: 'Mosquitto', info: 'Open-Source MQTT Broker' },
+            { name: 'Cloud Computing', info: 'Azure/AWS für Backend-Services' },
+            { name: 'Python', info: 'Skripte für Datenverarbeitung & Testing' },
+            { name: 'TortoiseSVN', info: 'Versionskontrolle im Team' }
+        ]
     },
     {
         id: 'softwareentwickler',
@@ -156,12 +172,27 @@ const experienceData = [
         yearLabel: '2023',
         title: 'Softwareentwickler',
         company: 'Altstätten, Sankt Gallen, Schweiz',
-        description: 'Mobile App Development, C# / Xamarin, Web Development, FileZilla, WordPress, PHP',
+        ort: 'Altstätten, Sankt Gallen, Schweiz',
+        beschreibung: 'Entwicklung mobiler Apps mit C#/Xamarin sowie Web-Anwendungen. Betreuung von WordPress-Projekten und Server-Administration.',
+        aufgaben: [
+            'Mobile App Development mit C# und Xamarin.Forms',
+            'Web Development: Frontend (HTML/CSS/JS) und Backend (PHP)',
+            'WordPress-Entwicklung: Themes, Plugins, Custom Post Types',
+            'Server-Administration via FileZilla (FTP/SFTP)',
+            'Datenbank-Design und -Optimierung (MySQL)'
+        ],
         icon: 'code',
         color: '#0071e3',
         category: 'work',
         badge: { label: 'Vollzeit', icon: 'briefcase' },
-        skills: ['Mobile App Development', 'C# / Xamarin', 'Web Development', 'FileZilla', 'WordPress', 'PHP']
+        skills: [
+            { name: 'C# / Xamarin', info: 'Mobile App Entwicklung für iOS & Android' },
+            { name: 'Web Development', info: 'HTML5, CSS3, JavaScript, PHP' },
+            { name: 'FileZilla', info: 'FTP/SFTP Client für Server-Management' },
+            { name: 'WordPress', info: 'CMS-Entwicklung: Themes & Plugins' },
+            { name: 'PHP', info: 'Serverseitige Programmierung' },
+            { name: 'MySQL', info: 'Datenbank-Design & Queries' }
+        ]
     },
     {
         id: 'rekrutenschule',
@@ -169,12 +200,25 @@ const experienceData = [
         yearLabel: '2024',
         title: 'Rekrutenschule',
         company: 'Frauenfeld, Thurgau, Schweiz',
-        description: 'Teamführung, Belastbarkeit, Kommunikationstechnik, Krisenmanagement',
+        ort: 'Frauenfeld, Thurgau, Schweiz',
+        beschreibung: 'Militärische Grundausbildung mit Fokus auf Führung, Kommunikation und Krisenmanagement.',
+        aufgaben: [
+            'Teamführung und Personalverantwortung in Übungsszenarien',
+            'Kommunikationstechnik: Funkgeräte, verschlüsselte Verbindungen',
+            'Krisenmanagement und Entscheidungsfindung unter Zeitdruck',
+            'Physische und mentale Belastbarkeitsübungen',
+            'Ausbildung in militärischer Taktik und Ordnung'
+        ],
         icon: 'graduation-cap',
         color: '#34c759',
         category: 'education',
         badge: { label: 'Ausbildung', icon: 'graduation-cap' },
-        skills: ['Teamführung', 'Belastbarkeit', 'Kommunikationstechnik', 'Krisenmanagement']
+        skills: [
+            { name: 'Teamführung', info: 'Führen von Gruppen in Ausbildungs-Szenarien' },
+            { name: 'Belastbarkeit', info: 'Physische & mentale Resilienz' },
+            { name: 'Kommunikationstechnik', info: 'Funk, BTM, verschlüsselte Verbindungen' },
+            { name: 'Krisenmanagement', info: 'Entscheidungen unter Druck & Unsicherheit' }
+        ]
     },
     {
         id: 'video-editor',
@@ -182,12 +226,25 @@ const experienceData = [
         yearLabel: '2025',
         title: 'Video Editor',
         company: 'Sankt Gallen, Schweiz',
-        description: 'Videoschnitt, Videoproduktion, CapCut Pro, Content-Produktion',
+        ort: 'Sankt Gallen, Schweiz',
+        beschreibung: 'Produktion und Schnitt von Video-Content für Social Media und Marketing. Einsatz von CapCut Pro für effiziente Workflows.',
+        aufgaben: [
+            'Videoschnitt und Post-Production für Social Media (Reels, Shorts, TikTok)',
+            'Videoproduktion: Drehplanung, Aufnahme, Licht, Ton',
+            'Content-Strategie und Redaktionsplanung',
+            'Effiziente Workflows mit CapCut Pro (Templates, Auto-Captions)',
+            'Zusammenarbeit mit Marketing-Team für Kampagnen-Umsetzung'
+        ],
         icon: 'play',
         color: '#5000ca',
         category: 'work',
         badge: { label: 'Content Creation', icon: 'award' },
-        skills: ['Videoschnitt', 'Videoproduktion', 'CapCut Pro', 'Content-Produktion']
+        skills: [
+            { name: 'Videoschnitt', info: 'Schnitt, Color Grading, Audio-Mixing' },
+            { name: 'Videoproduktion', info: 'Konzeption, Dreh, Post-Production' },
+            { name: 'CapCut Pro', info: 'Professionelles Schnitt-Tool mit KI-Features' },
+            { name: 'Content-Produktion', info: 'Redaktionsplanung, Storytelling, Publishing' }
+        ]
     },
     {
         id: 'qms-process-manager',
@@ -195,12 +252,28 @@ const experienceData = [
         yearLabel: '2025–heute',
         title: 'QMS Process Manager',
         company: 'Altstätten, Sankt Gallen, Schweiz',
-        description: 'Prozessmanagement, Prozessoptimierung, Qualitätsmanagement (ISO 9001), BPMN, Projektmanagement',
+        ort: 'Altstätten, Sankt Gallen, Schweiz',
+        beschreibung: 'Verantwortung für Qualitätsmanagementsystem (ISO 9001), Prozessoptimierung und BPMN-Modellierung. Steuerung von Projekten und Change-Management.',
+        aufgaben: [
+            'Weiterentwicklung und Pflege des QMS nach ISO 9001',
+            'Prozessmodellierung und -optimierung mit BPMN 2.0',
+            'Projektmanagement: Planung, Steuerung, Controlling',
+            'Change Management: Antragsprüfung, Risikobewertung, Freigabe',
+            'Audit-Vorbereitung und -Begleitung (intern/extern)',
+            'Schulung von Mitarbeitenden zu QM-Themen'
+        ],
         icon: 'briefcase',
         color: '#5000ca',
         category: 'work',
         badge: { label: 'Qualitätsmanagement', icon: 'certificate' },
-        skills: ['Prozessmanagement', 'Prozessoptimierung', 'Qualitätsmanagement (ISO 9001)', 'BPMN', 'Projektmanagement']
+        skills: [
+            { name: 'Prozessmanagement', info: 'End-to-End Prozessverantwortung' },
+            { name: 'Prozessoptimierung', info: 'Analyse, Verbesserung, Automatisierung' },
+            { name: 'Qualitätsmanagement (ISO 9001)', info: 'Normkonforme QMS-Gestaltung & Audits' },
+            { name: 'BPMN', info: 'Business Process Model and Notation 2.0' },
+            { name: 'Projektmanagement', info: 'Klassisch & agil (Scrum, Kanban)' },
+            { name: 'Change Management', info: 'ITIL-basierter Änderungsprozess' }
+        ]
     }
 ];
 
@@ -619,62 +692,88 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
         });
     }
 
-    // ============ NEW VANILLA JS EXPERIENCE TIMELINE ============
-    // Mobile: vertical accordion | Desktop: compact horizontal two-column
+    // ============ EXPERIENCE TIMELINE - ACCORDION STYLE ============
+    // Vertical timeline with expandable cards (accordion behavior)
     function initExperienceTimeline() {
         const container = document.getElementById('timeline-react-root') || document.getElementById('timeline');
         if (!container) return;
 
         let openIndex = DEFAULT_OPEN_INDEX;
-        let isDesktop = window.innerWidth >= 768;
 
         // Create timeline HTML
         function render() {
             const itemsHtml = experienceData.map((item, index) => {
                 const isOpen = index === openIndex;
-                const isNewest = index === DEFAULT_OPEN_INDEX;
-                const skillsHtml = item.skills.slice(0, 3).map(skill =>
-                    `<span class="timeline-skill">${skill}</span>`
+                const detailsId = `timeline-details-${item.id}`;
+                const headerId = `timeline-header-${item.id}`;
+
+                // Preview skills (max 3) for collapsed state
+                const previewSkills = item.skills.slice(0, 3).map(skill =>
+                    `<span class="timeline-skill timeline-skill-preview" data-tooltip="${escapeHtml(skill.info)}">${escapeHtml(skill.name)}</span>`
                 ).join('');
-                const extraSkills = item.skills.length > 3 ?
-                    `<span class="timeline-skill timeline-skill-more">+${item.skills.length - 3}</span>` : '';
+                const extraCount = item.skills.length > 3 ? item.skills.length - 3 : 0;
+                const extraSkillsHtml = extraCount > 0 ?
+                    `<span class="timeline-skill timeline-skill-more" aria-label="${extraCount} weitere Skills">+${extraCount}</span>` : '';
+
+                // All skills for expanded state (with tooltips)
+                const allSkillsHtml = item.skills.map(skill =>
+                    `<span class="timeline-skill" data-tooltip="${escapeHtml(skill.info)}">${escapeHtml(skill.name)}</span>`
+                ).join('');
+
+                // Aufgaben list
+                const aufgabenHtml = item.aufgaben && item.aufgaben.length > 0
+                    ? `<ul class="timeline-aufgaben">${item.aufgaben.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>`
+                    : '';
 
                 return `
                     <article class="timeline-item ${item.category} ${isOpen ? 'open' : ''}"
                              data-index="${index}"
                              data-animate="fade-up"
                              style="animation-delay: ${index * 100}ms">
-                        <div class="timeline-marker" style="background: ${item.color};">
-                            <i class="fas fa-${item.icon}" aria-hidden="true"></i>
+                        <div class="timeline-marker" style="--marker-color: ${item.color};">
+                            <i class="fas fa-${item.icon}" aria-hidden="true" style="color: var(--color-bg);"></i>
                         </div>
                         <div class="timeline-content">
-                            <header class="timeline-header">
-                                <div class="timeline-date">${item.date}</div>
+                            <header class="timeline-header" id="${headerId}" role="heading" aria-level="3">
+                                <div class="timeline-date">${escapeHtml(item.date)}</div>
                                 <div class="timeline-main">
-                                    <h3 class="timeline-title">${item.title}</h3>
-                                    <h4 class="timeline-company">${item.company}</h4>
+                                    <h3 class="timeline-title">${escapeHtml(item.title)}</h3>
+                                    <p class="timeline-company">${escapeHtml(item.ort)}</p>
                                 </div>
                                 ${item.badge ? `
                                     <span class="timeline-badge" style="background: ${item.color};">
                                         <i class="fas fa-${item.badge.icon}" aria-hidden="true"></i>
-                                        ${item.badge.label}
+                                        ${escapeHtml(item.badge.label)}
                                     </span>
                                 ` : ''}
                             </header>
-                            <div class="timeline-details" hidden=${!isOpen}>
-                                <p class="timeline-description">${item.description}</p>
-                                <div class="timeline-skills">
-                                    ${skillsHtml}
-                                    ${extraSkills}
+
+                            <!-- Preview skills (collapsed state) -->
+                            <div class="timeline-skills-preview" aria-hidden="${isOpen}">
+                                ${previewSkills}
+                                ${extraSkillsHtml}
+                            </div>
+
+                            <!-- Expandable details -->
+                            <div class="timeline-details" id="${detailsId}" role="region" aria-labelledby="${headerId}" hidden="${!isOpen}">
+                                <div class="timeline-details-inner">
+                                    ${item.beschreibung ? `<p class="timeline-description">${escapeHtml(item.beschreibung)}</p>` : ''}
+                                    ${aufgabenHtml}
+                                    <div class="timeline-skills" aria-label="Technologien und Skills">
+                                        ${allSkillsHtml}
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Toggle button (full header is also clickable via JS) -->
                             <button type="button"
                                     class="timeline-toggle"
                                     aria-expanded="${isOpen}"
-                                    aria-controls="timeline-details-${item.id}"
+                                    aria-controls="${detailsId}"
+                                    aria-label="${isOpen ? 'Details ausblenden' : 'Details anzeigen'}"
                                     data-index="${index}">
+                                <span class="timeline-toggle-text">${isOpen ? 'Weniger anzeigen' : 'Mehr anzeigen'}</span>
                                 <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                                <span class="sr-only">${isOpen ? 'Details ausblenden' : 'Details anzeigen'}</span>
                             </button>
                         </div>
                     </article>
@@ -690,39 +789,93 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
             attachListeners();
         }
 
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function attachListeners() {
             const items = container.querySelectorAll('.timeline-item');
             const toggles = container.querySelectorAll('.timeline-toggle');
 
+            // Click on toggle button
             toggles.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const index = parseInt(btn.dataset.index, 10);
                     toggleItem(index);
                 });
-
-                // Keyboard support
-                btn.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        const index = parseInt(btn.dataset.index, 10);
-                        toggleItem(index);
-                    }
-                });
             });
 
-            // Allow clicking on header to toggle (desktop)
-            if (isDesktop) {
-                items.forEach(item => {
-                    const header = item.querySelector('.timeline-header');
-                    if (header) {
-                        header.addEventListener('click', () => {
+            // Click on header (entire header area) - accordion trigger
+            items.forEach(item => {
+                const header = item.querySelector('.timeline-header');
+                if (header) {
+                    header.addEventListener('click', () => {
+                        const index = parseInt(item.dataset.index, 10);
+                        toggleItem(index);
+                    });
+                    // Keyboard support for header
+                    header.setAttribute('tabindex', '0');
+                    header.setAttribute('role', 'button');
+                    header.setAttribute('aria-expanded', item.classList.contains('open'));
+                    header.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
                             const index = parseInt(item.dataset.index, 10);
                             toggleItem(index);
-                        });
-                    }
+                        }
+                    });
+                }
+            });
+
+            // Tooltip handling for skill chips
+            const skillChips = container.querySelectorAll('.timeline-skill[data-tooltip]');
+            skillChips.forEach(chip => {
+                let tooltip = null;
+                let hideTimeout = null;
+
+                const showTooltip = () => {
+                    if (tooltip) return;
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'timeline-tooltip';
+                    tooltip.textContent = chip.dataset.tooltip;
+                    tooltip.setAttribute('role', 'tooltip');
+                    document.body.appendChild(tooltip);
+
+                    const rect = chip.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+                    tooltip.style.top = `${rect.top - 8}px`;
+                    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+
+                    requestAnimationFrame(() => tooltip.classList.add('visible'));
+                };
+
+                const hideTooltip = () => {
+                    if (!tooltip) return;
+                    tooltip.classList.remove('visible');
+                    tooltip.addEventListener('transitionend', () => {
+                        tooltip.remove();
+                        tooltip = null;
+                    }, { once: true });
+                };
+
+                chip.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                    showTooltip();
                 });
-            }
+                chip.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(hideTooltip, 100);
+                });
+                chip.addEventListener('focus', showTooltip);
+                chip.addEventListener('blur', hideTooltip);
+                // Touch support
+                chip.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    showTooltip();
+                }, { passive: false });
+            });
 
             // Arrow key navigation between items
             container.addEventListener('keydown', (e) => {
@@ -732,7 +885,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 const itemsArray = Array.from(items);
                 const currentFocus = document.activeElement;
                 let currentIndex = itemsArray.findIndex(item =>
-                    item.contains(currentFocus) || item.querySelector('.timeline-toggle') === currentFocus
+                    item.contains(currentFocus) || item.querySelector('.timeline-toggle') === currentFocus || item.querySelector('.timeline-header') === currentFocus
                 );
 
                 if (currentIndex === -1) currentIndex = openIndex;
@@ -744,13 +897,18 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 else if (e.key === 'End') newIndex = itemsArray.length - 1;
 
                 if (newIndex !== currentIndex) {
-                    itemsArray[newIndex].querySelector('.timeline-toggle').focus();
+                    const targetHeader = itemsArray[newIndex].querySelector('.timeline-header');
+                    if (targetHeader) targetHeader.focus();
                 }
             });
         }
 
         function toggleItem(index) {
-            if (index === openIndex) return; // Already open
+            if (index === openIndex) {
+                // Allow closing the currently open item on second click
+                closeItem(index);
+                return;
+            }
 
             const items = container.querySelectorAll('.timeline-item');
             const prevOpen = items[openIndex];
@@ -760,50 +918,80 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
 
             // Close previous
             if (prevOpen) {
-                prevOpen.classList.remove('open');
-                const prevDetails = prevOpen.querySelector('.timeline-details');
-                const prevToggle = prevOpen.querySelector('.timeline-toggle');
-                if (prevDetails) prevDetails.hidden = true;
-                if (prevToggle) prevToggle.setAttribute('aria-expanded', 'false');
+                closeItem(openIndex, false);
             }
 
             // Open new
-            newOpen.classList.add('open');
-            const newDetails = newOpen.querySelector('.timeline-details');
-            const newToggle = newOpen.querySelector('.timeline-toggle');
-            if (newDetails) newDetails.hidden = false;
-            if (newToggle) newToggle.setAttribute('aria-expanded', 'true');
-
+            openItem(newOpen, index);
             openIndex = index;
+        }
 
-            // Smooth scroll to new open item on mobile
-            if (!isDesktop) {
-                newOpen.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+        function openItem(item, index) {
+            const details = item.querySelector('.timeline-details');
+            const toggle = item.querySelector('.timeline-toggle');
+            const header = item.querySelector('.timeline-header');
+            const previewSkills = item.querySelector('.timeline-skills-preview');
+            const toggleText = toggle?.querySelector('.timeline-toggle-text');
+
+            item.classList.add('open');
+            if (details) {
+                details.hidden = false;
+                // Force reflow for animation
+                details.offsetHeight;
+                details.classList.add('expanded');
+            }
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.setAttribute('aria-label', 'Details ausblenden');
+            }
+            if (header) {
+                header.setAttribute('aria-expanded', 'true');
+            }
+            if (toggleText) toggleText.textContent = 'Weniger anzeigen';
+            if (previewSkills) previewSkills.setAttribute('aria-hidden', 'true');
+        }
+
+        function closeItem(index, updateOpenIndex = true) {
+            const items = container.querySelectorAll('.timeline-item');
+            const item = items[index];
+            if (!item) return;
+
+            const details = item.querySelector('.timeline-details');
+            const toggle = item.querySelector('.timeline-toggle');
+            const header = item.querySelector('.timeline-header');
+            const previewSkills = item.querySelector('.timeline-skills-preview');
+            const toggleText = toggle?.querySelector('.timeline-toggle-text');
+
+            item.classList.remove('open');
+            if (details) {
+                details.classList.remove('expanded');
+                // Wait for transition before hiding
+                const handleTransitionEnd = () => {
+                    if (!item.classList.contains('open')) {
+                        details.hidden = true;
+                    }
+                    details.removeEventListener('transitionend', handleTransitionEnd);
+                };
+                details.addEventListener('transitionend', handleTransitionEnd);
+            }
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-label', 'Details anzeigen');
+            }
+            if (header) {
+                header.setAttribute('aria-expanded', 'false');
+            }
+            if (toggleText) toggleText.textContent = 'Mehr anzeigen';
+            if (previewSkills) previewSkills.setAttribute('aria-hidden', 'false');
+
+            if (updateOpenIndex && openIndex === index) {
+                openIndex = -1;
             }
         }
 
-        // Handle resize - switch between mobile/desktop mode
-        let resizeTimer = null;
-        function handleResize() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                const wasDesktop = isDesktop;
-                isDesktop = window.innerWidth >= 768;
-                if (wasDesktop !== isDesktop) {
-                    render(); // Re-render for mode change
-                }
-            }, 100);
-        }
-
-        window.addEventListener('resize', handleResize, { passive: true });
-
-        // Initial render
-        render();
-
         // Cleanup
         return () => {
-            window.removeEventListener('resize', handleResize);
-            if (resizeTimer) clearTimeout(resizeTimer);
+            // No persistent listeners to clean up (all on container or recreated on render)
         };
     }
 
