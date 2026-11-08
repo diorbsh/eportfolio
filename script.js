@@ -223,6 +223,7 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
         initKeyboardNavigation();
         initHeaderScroll();
         initPageTransitions();
+        initBackToTop();
         initHeroTyping();
         initSpotlightCards();
         initCopyButtons();
@@ -1628,6 +1629,44 @@ const DEFAULT_OPEN_INDEX = experienceData.length - 1;
                 }
             });
         });
+    }
+
+    function initBackToTop() {
+        const backToTopBtn = document.querySelector('.footer-back-to-top');
+        if (!backToTopBtn) return;
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let ticking = false;
+
+        function updateBackToTop() {
+            const scrollY = window.scrollY;
+            const viewportHeight = window.innerHeight;
+            const showThreshold = viewportHeight * 0.5; // Show after scrolling half viewport
+
+            if (scrollY > showThreshold) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(updateBackToTop);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Also handle click for smooth scroll to top (backup to native smooth scroll)
+        backToTopBtn.addEventListener('click', (e) => {
+            if (prefersReducedMotion) return;
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initial check
+        updateBackToTop();
     }
 
     /**
